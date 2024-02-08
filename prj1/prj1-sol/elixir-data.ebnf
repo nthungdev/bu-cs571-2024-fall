@@ -1,0 +1,72 @@
+program:
+  : data-literal-sequence
+  ;
+data-literal-sequence
+  : data
+  | data ' ' data-literal-sequence
+  |
+  ;
+data-literal
+  : list
+  | tuple
+  | map
+  | primitive
+  ;
+primitive
+  : integer
+  | atom
+  | boolean
+  ;
+list
+  : '[' data-literal-comma ']'
+  ;
+data-literal-comma
+  : data-literal
+  | data-literal ',' data-literal-comma
+  |
+  ;
+tuple
+  : '{' data-literal-comma '}'
+  ;
+map
+  : '%{' '}'
+  : '%{' key-pair '}'
+  : '%{' key-pair,  '}'
+  ;
+key-pair-comma
+  : key-pair ',' key-pair-comma
+  ;
+key-pair
+  : data-literal '=>' data-literal
+  | key ' ' data-literal
+  ;
+integer
+  : digit
+  | digit integer
+  | digit '_' integer
+  ;
+// TODO check atom
+atom
+  : ':' alpha
+  | '_' alpha-under
+  | '_'
+  ;
+alpha-under
+  | '_' alpha-under
+  | alpha alpha-under
+  | alpha
+  | '_'
+  ;
+alpha
+  : a-z
+  ;
+// TODO check key
+key
+  : alpha ':'
+  | '_' alpha-under
+  | '_'
+  ;
+boolean
+  : 'true'
+  | 'false'
+  ;
