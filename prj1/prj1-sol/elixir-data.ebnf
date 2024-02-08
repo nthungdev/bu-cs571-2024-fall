@@ -30,14 +30,15 @@ tuple
   ;
 map
   : '%{' '}'
-  : '%{' key-pair '}'
-  : '%{' key-pair,  '}'
+  : '%{' key-pair-comma '}'
   ;
 key-pair-comma
-  : key-pair ',' key-pair-comma
+  : key-pair
+  ; key-pair ',' key-pair-comma
   ;
 key-pair
   : data-literal '=>' data-literal
+  : data-literal ':' data-literal
   | key ' ' data-literal
   ;
 integer
