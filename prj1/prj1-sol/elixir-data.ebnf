@@ -1,10 +1,11 @@
 program:
-  : data-literal-sequence
-  ;
-data-literal-sequence
-  : data
-  | data ' ' data-literal-sequence
+  : sentence
+  | sentence '\n' program
   |
+  ;
+sentence
+  : data-literal
+  | data-literal ' ' data-literal-sequence
   ;
 data-literal
   : list
@@ -19,55 +20,71 @@ primitive
   ;
 list
   : '[' data-literal-comma ']'
+  : '[' ']'
+  ;
+tuple
+  : '{' data-literal-comma '}'
+  | '{' '}'
+  ;
+map
+  : '%{' key-pair-comma '}'
+  | '%{' '}'
+  ;
+key-pair
+  : data-literal '=>' data-literal
+  | key ' ' data-literal
+  ;
+integer
+  : num
+  | num integer
+  | num '_' integer
+  ;
+atom
+  : ':' alpha
+  | ':' alpha alpha-num-under
+  | ':' alpha-num-under
+  ;
+key
+  : alpha ':'
+  | alpha alpha-num-under ':'
+  | alpha-num-under ':'
+  ;
+boolean
+  : 'true'
+  | 'false'
   ;
 data-literal-comma
   : data-literal
   | data-literal ',' data-literal-comma
-  |
-  ;
-tuple
-  : '{' data-literal-comma '}'
-  ;
-map
-  : '%{' '}'
-  : '%{' key-pair-comma '}'
   ;
 key-pair-comma
   : key-pair
   ; key-pair ',' key-pair-comma
   ;
-key-pair
-  : data-literal '=>' data-literal
-  : data-literal ':' data-literal
-  | key ' ' data-literal
-  ;
-integer
-  : digit
-  | digit integer
-  | digit '_' integer
-  ;
-// TODO check atom
-atom
-  : ':' alpha
-  | '_' alpha-under
-  | '_'
+alpha-num-under
+  : '_'
+  | '_' alpha-num-under
+  | alpha-num
   ;
 alpha-under
+  : '_'
+  | alpha
   | '_' alpha-under
   | alpha alpha-under
-  | alpha
-  | '_'
   ;
 alpha
   : a-z
+  | A-Z
+  | a-z alpha
+  | A-Z alpha
   ;
-// TODO check key
-key
-  : alpha ':'
-  | '_' alpha-under
-  | '_'
+num
+  : 0-9
+  | 0-9 num
   ;
-boolean
-  : 'true'
-  | 'false'
+alpha-num
+  : alpha
+  | num
+  | alpha alpha-num
+  | num alpha-num
   ;
