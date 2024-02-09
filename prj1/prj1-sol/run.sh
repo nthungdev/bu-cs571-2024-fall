@@ -8,5 +8,5 @@ dir=`dirname $0`
 
 #use $dir/ as prefix to access any programs in this dir
 #so that this script can be run from any directory.
-
+node $dir/index.mjs
 
