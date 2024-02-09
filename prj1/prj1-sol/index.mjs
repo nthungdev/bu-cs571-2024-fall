@@ -1,7 +1,11 @@
+#!/usr/bin/env node
+
+import fs from 'fs'
+
 /**
  * @param {string} str
  */
-const scan = (str) => {
+const scan = (str = '') => {
   const tokens = []
   let m
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
@@ -17,7 +21,7 @@ const scan = (str) => {
     } else if ((m = s.match(/^:[_a-zA-Z]+[_a-zA-Z0-9]*/))) {
       // atom
       tokens.push(new Token('atom', m[0]))
-    } else if ((m = s.match(/^%?{|^[\[\]}]|^=>\s*)/s))) {
+    } else if ((m = s.match(/^%?{|^[\[\]}]|^=>\s*/))) {
       // map or tuple bracket, =>
       // TODO handle when not found closing bracket
       tokens.push(new Token('symbol', m[0]))
@@ -35,3 +39,11 @@ class Token {
     Object.assign(this, { kind, lexeme })
   }
 }
+
+const main = () => {
+  const [, , input] = process.argv
+  console.log('input', input)
+  console.log('tokens', scan(input))
+}
+
+main()
