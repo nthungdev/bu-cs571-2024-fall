@@ -37,7 +37,7 @@ class Parser {
   constructor(tokens) {
     this._tokens = tokens
     this._index = 0
-    this.tok = this._nextToken() // lookahead
+    this.token = this._nextToken() // lookahead
   }
 
   // wrapper used for crude  error recovery
@@ -45,7 +45,7 @@ class Parser {
     try {
       let result = this.parseLo()
       if (!this.peek('EOF')) {
-        const msg = `expecting end-of-input at "${this.tok.lexeme}"`
+        const msg = `expecting end-of-input at "${this.token.lexeme}"`
         throw new SyntaxError(msg)
       }
       return result
@@ -70,7 +70,6 @@ class Parser {
   dataLiteral() {
     // TODO
     if (this.peek('[')) {
-      this.consume('[')
       let l = this.list()
       return l
     } else if (this.peek('{')) {
@@ -92,18 +91,18 @@ class Parser {
   }
 
   list() {
+    this.consume('[')
     const items = []
-    if (peek(']')) {
-      return {
-        '%k': 'list',
-        '%v': [],
-      }
-    } else {
-      while (!peek(']')) {
-        const dl = this.dataLiteral()
-        items.push(dl)
+
+    while (!this.peek(']')) {
+      const dl = this.dataLiteral()
+      items.push(dl)
+      if (this.peek(',')) {
+        this.consume(',')
       }
     }
+
+    this.consume(']')
 
     return {
       '%k': 'list',
@@ -124,11 +123,15 @@ class Parser {
   }
 
   integer() {
-    // TODO
+    const token = this.token
+    this.consume('integer')
+    return token
   }
 
   atom() {
-    // TODO
+    const token = this.token
+    this.consume('atom')
+    return token
   }
 
   boolean() {
@@ -144,14 +147,14 @@ class Parser {
   }
 
   peek(kind) {
-    return this.tok.kind === kind
+    return this.token.kind === kind
   }
 
   consume(kind) {
     if (this.peek(kind)) {
-      this.tok = this._nextToken()
+      this.token = this._nextToken()
     } else {
-      const msg = `expecting ${kind} at "${this.tok.lexeme}"`
+      const msg = `expecting ${kind} at "${this.token.lexeme}"`
       throw new SyntaxError(msg)
     }
   }
@@ -199,7 +202,12 @@ const main = () => {
   // const [, , input] = process.argv
   const input = tests[4]
   console.log('input', input)
-  console.log('tokens', scan(input))
+  const tokens = scan(input)
+  console.log('tokens', tokens)
+
+  const p = new Parser(tokens)
+  const res = p.parse()
+  console.log(JSON.stringify(res))
 }
 
 main()
