@@ -27,11 +27,143 @@ const scan = (str = '') => {
     } else if ((m = s.match(/^%?{|^[\[\]}]|^=>*|,/))) {
       // map or tuple bracket, =>, comma
       // TODO handle error when not found closing bracket
-      tokens.push(new Token('symbol', m[0]))
+      tokens.push(new Token(m[0], m[0]))
     }
   }
   return tokens
 }
+
+class Parser {
+  constructor(tokens) {
+    this._tokens = tokens
+    this._index = 0
+    this.tok = this._nextToken() // lookahead
+  }
+
+  // wrapper used for crude  error recovery
+  parse() {
+    try {
+      let result = this.parseLo()
+      if (!this.peek('EOF')) {
+        const msg = `expecting end-of-input at "${this.tok.lexeme}"`
+        throw new SyntaxError(msg)
+      }
+      return result
+    } catch (err) {
+      return err
+    }
+  }
+
+  parseLo() {
+    return this.sentence()
+  }
+
+  sentence() {
+    let s = []
+    while (!this.peek('EOF')) {
+      let dl = this.dataLiteral()
+      s.push(dl)
+    }
+    return s
+  }
+
+  dataLiteral() {
+    // TODO
+    if (this.peek('[')) {
+      this.consume('[')
+      let l = this.list()
+      return l
+    } else if (this.peek('{')) {
+      let t = this.tuple()
+      return t
+    } else if (this.peek('%{')) {
+      let m = this.map()
+      return m
+    } else if (this.peek('integer')) {
+      let i = this.integer()
+      return i
+    } else if (this.peek('atom')) {
+      let a = this.atom()
+      return a
+    } else if (this.peek('boolean')) {
+      let b = this.boolean()
+      return b
+    }
+  }
+
+  list() {
+    const items = []
+    if (peek(']')) {
+      return {
+        '%k': 'list',
+        '%v': [],
+      }
+    } else {
+      while (!peek(']')) {
+        const dl = this.dataLiteral()
+        items.push(dl)
+      }
+    }
+
+    return {
+      '%k': 'list',
+      '%v': items,
+    }
+  }
+
+  tuple() {
+    // TODO
+  }
+
+  map() {
+    // TODO
+  }
+
+  primitive() {
+    // TODO
+  }
+
+  integer() {
+    // TODO
+  }
+
+  atom() {
+    // TODO
+  }
+
+  boolean() {
+    // TODO
+  }
+
+  keyPair() {
+    // TODO
+  }
+
+  key() {
+    // TODO
+  }
+
+  peek(kind) {
+    return this.tok.kind === kind
+  }
+
+  consume(kind) {
+    if (this.peek(kind)) {
+      this.tok = this._nextToken()
+    } else {
+      const msg = `expecting ${kind} at "${this.tok.lexeme}"`
+      throw new SyntaxError(msg)
+    }
+  }
+
+  _nextToken() {
+    if (this._index < this._tokens.length) {
+      return this._tokens[this._index++]
+    } else {
+      return new Token('EOF', '<EOF>')
+    }
+  }
+} //Parser
 
 class Token {
   constructor(kind, lexeme) {
@@ -53,10 +185,19 @@ const main = () => {
     :atom
 
     `,
+    4: `
+    [ :a, 22, :b ][]
+
+    [
+      :some_atom12,
+      # 99
+      12
+    ]
+    `,
   }
 
   // const [, , input] = process.argv
-  const input = tests[3]
+  const input = tests[4]
   console.log('input', input)
   console.log('tokens', scan(input))
 }
