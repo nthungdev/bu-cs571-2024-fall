@@ -5,7 +5,7 @@ import fs from 'fs'
 /**
  * @param {string} str
  */
-const scan = (str = '') => {
+const tokenize = (str = '') => {
   const tokens = []
   let m
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
@@ -41,8 +41,8 @@ class Token {
     this.lexeme = lexeme
   }
   getMap() {
-    const k = (this.kind === 'key' ? 'atom' : this.kind)
-    const v = (this.kind === 'key' ? `:${this.lexeme.slice(0, -1)}` : this.lexeme)
+    const k = this.kind === 'key' ? 'atom' : this.kind
+    const v = this.kind === 'key' ? `:${this.lexeme.slice(0, -1)}` : this.lexeme
     return {
       '%k': k,
       '%v': v,
@@ -106,8 +106,7 @@ class Parser {
     } else if (this.peek('int') | this.peek('atom') | this.peek('boolean')) {
       let primitive = this.primitive()
       return primitive
-    }
-    else {
+    } else {
       throw Error('unexpected data literal')
     }
   }
@@ -247,15 +246,14 @@ const main = () => {
  `,
   }
 
-  // const [, , input] = process.argv
-  const input = tests[6]
-  console.log('input', input)
-  const tokens = scan(input)
-  console.log('tokens', tokens)
+  const input = fs.readFileSync(0, 'utf8')
+  // const input = tests[6]
+
+  const tokens = tokenize(input)
 
   const p = new Parser(tokens)
   const res = p.parse()
-  console.log(JSON.stringify(res))
+  console.log(JSON.stringify(res, undefined, 2))
 }
 
 main()
