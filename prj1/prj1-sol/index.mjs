@@ -8,37 +8,64 @@ import fs from 'fs'
 const tokenize = (str = '') => {
   const tokens = []
   let m
+  let col = 0
+  let row = 0
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
-    if ((m = s.match(/^[\s\t]+/))) {
+    let newLine = false
+    let skip = false
+    let kind
+    let lexeme
+    if ((m = s.match(/^\n/))) {
+      newLine = true
+    } else if ((m = s.match(/^[\s\t]+/))) {
       // s starts with linear whitespace
-      continue
+      skip = true
     } else if ((m = s.match(/^#.*$/m))) {
       // skip comment
-      continue
+      newLine = true
     } else if ((m = s.match(/^true|^false/))) {
-      tokens.push(new Token('bool', JSON.parse(m[0])))
+      kind = 'bool'
+      lexeme = JSON.parse(m[0])
     } else if ((m = s.match(/^\d+(?:_\d+)*/))) {
       // integer (with internal underscore)
-      tokens.push(new Token('int', parseInt(m[0].replace(/_/g, ''))))
+      kind = 'int'
+      lexeme = parseInt(m[0].replace(/_/g, ''))
     } else if ((m = s.match(/^:[a-zA-Z]+[_a-zA-Z0-9]*/))) {
-      tokens.push(new Token('atom', m[0]))
+      kind = 'atom'
+      lexeme = m[0]
     } else if ((m = s.match(/^[a-zA-Z]+[_a-zA-Z0-9]*:/))) {
-      tokens.push(new Token('key', m[0]))
+      kind = 'key'
+      lexeme = m[0]
+      // tokens.push(new Token('key', m[0]))
     } else if ((m = s.match(/^%?{|^[\[\]}]|^=>*|,/))) {
       // map or tuple bracket, =>, comma
       // TODO handle error when not found closing bracket
-      tokens.push(new Token(m[0], m[0]))
+      kind = m[0]
+      lexeme = m[0]
+    }
+
+    if (newLine) {
+      row++
+      col = 0
+    } else {
+      col += m[0].length
+
+      if (!skip) {
+        tokens.push(new Token(kind, lexeme, col, row))
+      }
     }
   }
   return tokens
 }
 
 class Token {
-  constructor(kind, lexeme) {
+  constructor(kind, lexeme, col, row) {
     /** @type {string} */
     this.kind = kind
     /** @type {string} */
     this.lexeme = lexeme
+    this.col = col
+    this.row = row
   }
   getMap() {
     const k = this.kind === 'key' ? 'atom' : this.kind
@@ -210,60 +237,11 @@ class Parser {
 } //Parser
 
 const main = () => {
-  const tests = {
-    1: '%{a: 22, [33] => 44, c: {55, :d, []}}',
-    2: `# this file contains no data
-
-    #but it contains multiple comments`,
-    3: `# single atom
-
-    :atom
-
-    `,
-    4: `
-    [ :a, 22, :b ][]
-
-    [
-      :some_atom12,
-      # 99
-      12
-    ]
-    `,
-    5: `{ :a, 22 }
-
-    {:x, :y, :z}{}
-
-    {
-    33
-    } #{55}`,
-    6: `%{ [:a, 22] => { [1, 2, 3], :x },
-    x: [99, %{ a: 33 }],
- }
-
- { [1, 2], {:a, 22}, %{ a: 99, :b => 11} }
-
- [ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]
- `,
-    7: `# multiple int's with internal underscores
-
- 123_456_789
-
- 1_2_3
- `,
-    8: `# single int
-
- 1234`,
-    9: `12_34
- true
- :some_long_atom_1234
- false
- 833_4
- `,
-  }
-
   try {
-    const input = fs.readFileSync(0, 'utf8')
-    // const input = tests[9]
+    // read test file path from argument for development purpose
+    const testPath = process.argv[2] ?? 0
+
+    const input = fs.readFileSync(testPath, 'utf8')
 
     const tokens = tokenize(input)
 
