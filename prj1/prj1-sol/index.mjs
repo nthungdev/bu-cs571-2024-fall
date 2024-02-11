@@ -19,7 +19,7 @@ const scan = (str = '') => {
       tokens.push(new Token('boolean', m[0]))
     } else if ((m = s.match(/^\d+(_\d+)*/))) {
       // integer (with internal underscore)
-      tokens.push(new Token('integer', m[0]))
+      tokens.push(new Token('int', parseInt(m[0])))
     } else if ((m = s.match(/^:[a-zA-Z]+[_a-zA-Z0-9]*/))) {
       tokens.push(new Token('atom', m[0]))
     } else if ((m = s.match(/^[a-zA-Z]+[_a-zA-Z0-9]*:/))) {
@@ -33,10 +33,36 @@ const scan = (str = '') => {
   return tokens
 }
 
+class Token {
+  constructor(kind, lexeme) {
+    /** @type {string} */
+    this.kind = kind
+    /** @type {string} */
+    this.lexeme = lexeme
+  }
+  getMap() {
+    const k = (this.kind === 'key' ? 'atom' : this.kind)
+    const v = (this.kind === 'key' ? `:${this.lexeme.slice(0, -1)}` : this.lexeme)
+    return {
+      '%k': k,
+      '%v': v,
+    }
+  }
+  toString() {
+    return `Token { %k: ${this.kind}, %v: ${this.lexeme} }`
+  }
+}
+
 class Parser {
+  /**
+   * @param {string[]} tokens
+   */
   constructor(tokens) {
+    /** @type {string[]} */
     this._tokens = tokens
+    /** @type {number} */
     this._index = 0
+    /** @type {Token} */
     this.token = this._nextToken() // lookahead
   }
 
@@ -68,7 +94,6 @@ class Parser {
   }
 
   dataLiteral() {
-    // TODO
     if (this.peek('[')) {
       let l = this.list()
       return l
@@ -78,22 +103,18 @@ class Parser {
     } else if (this.peek('%{')) {
       let m = this.map()
       return m
-    } else if (this.peek('integer')) {
-      let i = this.integer()
-      return i
-    } else if (this.peek('atom')) {
-      let a = this.atom()
-      return a
-    } else if (this.peek('boolean')) {
-      let b = this.boolean()
-      return b
+    } else if (this.peek('int') | this.peek('atom') | this.peek('boolean')) {
+      let primitive = this.primitive()
+      return primitive
+    }
+    else {
+      throw Error('unexpected data literal')
     }
   }
 
   list() {
     this.consume('[')
     const items = []
-
     while (!this.peek(']')) {
       const dl = this.dataLiteral()
       items.push(dl)
@@ -101,9 +122,7 @@ class Parser {
         this.consume(',')
       }
     }
-
     this.consume(']')
-
     return {
       '%k': 'list',
       '%v': items,
@@ -111,39 +130,62 @@ class Parser {
   }
 
   tuple() {
-    // TODO
+    this.consume('{')
+    const items = []
+    while (!this.peek('}')) {
+      const dl = this.dataLiteral()
+      items.push(dl)
+      if (this.peek(',')) {
+        this.consume(',')
+      }
+    }
+    this.consume('}')
+    return {
+      '%k': 'tuple',
+      '%v': items,
+    }
   }
 
   map() {
-    // TODO
+    this.consume('%{')
+    const items = []
+    while (!this.peek('}')) {
+      const pair = this.keyPair()
+      items.push(pair)
+      if (this.peek(',')) {
+        this.consume(',')
+      }
+    }
+    this.consume('}')
+    return {
+      '%k': 'map',
+      '%v': items,
+    }
   }
 
   primitive() {
-    // TODO
-  }
-
-  integer() {
     const token = this.token
-    this.consume('integer')
-    return token
-  }
-
-  atom() {
-    const token = this.token
-    this.consume('atom')
-    return token
-  }
-
-  boolean() {
-    // TODO
+    this.consume(token.kind)
+    return token.getMap()
   }
 
   keyPair() {
-    // TODO
+    const pair = []
+    if (this.peek('key')) {
+      pair.push(this.key())
+      pair.push(this.dataLiteral())
+    } else {
+      pair.push(this.dataLiteral())
+      this.consume('=>')
+      pair.push(this.dataLiteral())
+    }
+    return pair
   }
 
   key() {
-    // TODO
+    const token = this.token
+    this.consume(token.kind)
+    return token.getMap()
   }
 
   peek(kind) {
@@ -168,15 +210,6 @@ class Parser {
   }
 } //Parser
 
-class Token {
-  constructor(kind, lexeme) {
-    Object.assign(this, { kind, lexeme })
-  }
-  toString() {
-    return `Token { kind: ${this.name}, lexeme: ${this.age} }`
-  }
-}
-
 const main = () => {
   const tests = {
     1: '%{a: 22, [33] => 44, c: {55, :d, []}}',
@@ -197,10 +230,25 @@ const main = () => {
       12
     ]
     `,
+    5: `{ :a, 22 }
+
+    {:x, :y, :z}{}
+
+    {
+    33
+    } #{55}`,
+    6: `%{ [:a, 22] => { [1, 2, 3], :x },
+    x: [99, %{ a: 33 }]
+ }
+
+ { [1, 2], {:a, 22}, %{ a: 99, :b => 11} }
+
+ [ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]
+ `,
   }
 
   // const [, , input] = process.argv
-  const input = tests[4]
+  const input = tests[6]
   console.log('input', input)
   const tokens = scan(input)
   console.log('tokens', tokens)
