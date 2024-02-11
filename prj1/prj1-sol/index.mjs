@@ -6,11 +6,13 @@ import fs from 'fs'
  * @param {string} str
  */
 const tokenize = (str = '') => {
+  const brackets = []
   const tokens = []
   let m
   let col = 0
   let row = 0
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
+    let errorMessage
     let newLine = false
     let skip = false
     let kind
@@ -26,7 +28,7 @@ const tokenize = (str = '') => {
     } else if ((m = s.match(/^true|^false/))) {
       kind = 'bool'
       lexeme = JSON.parse(m[0])
-    } else if ((m = s.match(/^\d+(?:_\d+)*/))) {
+    } else if ((m = s.match(/^\d+(?:_\d+)*(?=\W|$|\Z)/))) {
       // integer (with internal underscore)
       kind = 'int'
       lexeme = parseInt(m[0].replace(/_/g, ''))
@@ -37,11 +39,33 @@ const tokenize = (str = '') => {
       kind = 'key'
       lexeme = m[0]
       // tokens.push(new Token('key', m[0]))
-    } else if ((m = s.match(/^%?{|^[\[\]}]|^=>*|,/))) {
+    } else if ((m = s.match(/^%?{|^\[/))) {
       // map or tuple bracket, =>, comma
       // TODO handle error when not found closing bracket
+      brackets.push(m[0])
       kind = m[0]
       lexeme = m[0]
+    } else if ((m = s.match(/^=>|^\,/))) {
+      kind = m[0]
+      lexeme = m[0]
+    } else if ((m = s.match(/^[\]\}]/))) {
+      const lastBracket = brackets.pop()
+      if (!lastBracket) {
+        // get closing bracket without prior opening bracket
+        errorMessage = `unexpected ${m[0]}`
+      } else if (
+        // mismatched closing bracket
+        (lastBracket === '[' && m[0] !== ']') ||
+        (lastBracket === '{' && m[0] !== '}') ||
+        (lastBracket === '%{' && m[0] !== '}')
+      ) {
+        errorMessage = `expecting '${lastBracket}' but got '${m[0]}'`
+      }
+
+      kind = m[0]
+      lexeme = m[0]
+    } else if ((m = s.match(/./))) {
+      errorMessage = `unexpected ${m[0]}`
     }
 
     if (newLine) {
@@ -49,6 +73,10 @@ const tokenize = (str = '') => {
       col = 0
     } else {
       col += m[0].length
+
+      if (errorMessage) {
+        throw errorMessage
+      }
 
       if (!skip) {
         tokens.push(new Token(kind, lexeme, col, row))
@@ -249,6 +277,7 @@ const main = () => {
     const res = p.parse()
     console.log(JSON.stringify(res, undefined, 2))
   } catch (error) {
+    console.error(error)
     process.exit(1)
   }
 }
