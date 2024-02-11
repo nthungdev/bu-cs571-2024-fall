@@ -6,7 +6,6 @@ import fs from 'fs'
  * @param {string} str
  */
 const tokenize = (str = '') => {
-  const brackets = []
   const tokens = []
   let m
   let col = 0
@@ -25,7 +24,7 @@ const tokenize = (str = '') => {
     } else if ((m = s.match(/^#.*$/m))) {
       // skip comment
       newLine = true
-    } else if ((m = s.match(/^true|^false/))) {
+    } else if ((m = s.match(/^(?:true|false)\b/))) {
       kind = 'bool'
       lexeme = JSON.parse(m[0])
     } else if ((m = s.match(/^\d+(?:_\d+)*(?=\W|$|\Z)/))) {
@@ -38,34 +37,12 @@ const tokenize = (str = '') => {
     } else if ((m = s.match(/^[a-zA-Z]+[_a-zA-Z0-9]*:/))) {
       kind = 'key'
       lexeme = m[0]
-      // tokens.push(new Token('key', m[0]))
-    } else if ((m = s.match(/^%?{|^\[/))) {
-      // map or tuple bracket, =>, comma
-      // TODO handle error when not found closing bracket
-      brackets.push(m[0])
+    } else if ((m = s.match(/^%?{|^\[|^=>|^\,|^[\]\}]/))) {
+      // brackets, =>, comma
       kind = m[0]
       lexeme = m[0]
-    } else if ((m = s.match(/^=>|^\,/))) {
-      kind = m[0]
-      lexeme = m[0]
-    } else if ((m = s.match(/^[\]\}]/))) {
-      const lastBracket = brackets.pop()
-      if (!lastBracket) {
-        // get closing bracket without prior opening bracket
-        errorMessage = `unexpected ${m[0]}`
-      } else if (
-        // mismatched closing bracket
-        (lastBracket === '[' && m[0] !== ']') ||
-        (lastBracket === '{' && m[0] !== '}') ||
-        (lastBracket === '%{' && m[0] !== '}')
-      ) {
-        errorMessage = `expecting '${lastBracket}' but got '${m[0]}'`
-      }
-
-      kind = m[0]
-      lexeme = m[0]
-    } else if ((m = s.match(/./))) {
-      errorMessage = `unexpected ${m[0]}`
+    } else if ((m = s.match(/.*\b/))) {
+      errorMessage = `error: unexpected '${m[0]}' token`
     }
 
     if (newLine) {
@@ -111,8 +88,11 @@ class Token {
 class Parser {
   /**
    * @param {string[]} tokens
+   * @param {string[]} input
    */
-  constructor(tokens) {
+  constructor(tokens, input) {
+    /** @type {string} */
+    this._input = input
     /** @type {string[]} */
     this._tokens = tokens
     /** @type {number} */
@@ -126,12 +106,11 @@ class Parser {
     try {
       let result = this.parseLo()
       if (!this.peek('EOF')) {
-        const msg = `expecting end-of-input at "${this.token.lexeme}"`
-        throw new SyntaxError(msg)
+        this._handleError({ kind: 'end-of-input' })
       }
       return result
     } catch (err) {
-      return err
+      throw err
     }
   }
 
@@ -162,7 +141,7 @@ class Parser {
       let primitive = this.primitive()
       return primitive
     } else {
-      throw Error('unexpected data literal')
+      this._handleError({ kind: 'data-literal' })
     }
   }
 
@@ -170,11 +149,16 @@ class Parser {
     this.consume('[')
     const items = []
     while (!this.peek(']')) {
+      if (items.length !== 0) {
+        if (this.peek(',')) {
+          this.consume(',')
+        } else {
+          this._handleError({ kind: ',' })
+        }
+      }
+
       const dl = this.dataLiteral()
       items.push(dl)
-      if (this.peek(',')) {
-        this.consume(',')
-      }
     }
     this.consume(']')
     return {
@@ -251,8 +235,24 @@ class Parser {
       this.token = this._nextToken()
     } else {
       const msg = `expecting ${kind} at "${this.token.lexeme}"`
-      throw new SyntaxError(msg)
+      this._handleError({ kind })
     }
+  }
+
+  _handleError({ kind, message }) {
+    const lines = this._input.split('\n')
+    const line = lines[this.token.row]
+    const spaces = Array(this.token.col - 1)
+      .fill(' ')
+      .join('')
+    const mess = kind
+      ? `expecting ${kind} at "${this.token.lexeme}"`
+      : message ?? ''
+    let errorMessage = `error: ${mess}
+    ${line}
+    ${spaces}^`
+
+    throw errorMessage
   }
 
   _nextToken() {
@@ -262,18 +262,18 @@ class Parser {
       return new Token('EOF', '<EOF>')
     }
   }
-} //Parser
+} // Parser
 
 const main = () => {
   try {
-    // read test file path from argument for development purpose
+    // read test file path from argument (if present) for development purpose
     const testPath = process.argv[2] ?? 0
 
     const input = fs.readFileSync(testPath, 'utf8')
 
     const tokens = tokenize(input)
 
-    const p = new Parser(tokens)
+    const p = new Parser(tokens, input)
     const res = p.parse()
     console.log(JSON.stringify(res, undefined, 2))
   } catch (error) {
