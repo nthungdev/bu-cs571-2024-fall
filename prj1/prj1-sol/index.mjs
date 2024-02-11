@@ -253,22 +253,26 @@ const main = () => {
     8: `# single int
 
  1234`,
- 9: `12_34
+    9: `12_34
  true
  :some_long_atom_1234
  false
  833_4
- `
+ `,
   }
 
-  const input = fs.readFileSync(0, 'utf8')
-  // const input = tests[9]
+  try {
+    const input = fs.readFileSync(0, 'utf8')
+    // const input = tests[9]
 
-  const tokens = tokenize(input)
+    const tokens = tokenize(input)
 
-  const p = new Parser(tokens)
-  const res = p.parse()
-  console.log(JSON.stringify(res, undefined, 2))
+    const p = new Parser(tokens)
+    const res = p.parse()
+    console.log(JSON.stringify(res, undefined, 2))
+  } catch (error) {
+    process.exit(1)
+  }
 }
 
 main()
