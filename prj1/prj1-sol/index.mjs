@@ -15,11 +15,11 @@ const tokenize = (str = '') => {
     } else if ((m = s.match(/^#.*$/m))) {
       // skip comment
       continue
-    } else if ((m = s.match(/^true|false/))) {
-      tokens.push(new Token('boolean', m[0]))
-    } else if ((m = s.match(/^\d+(_\d+)*/))) {
+    } else if ((m = s.match(/^true|^false/))) {
+      tokens.push(new Token('bool', JSON.parse(m[0])))
+    } else if ((m = s.match(/^\d+(?:_\d+)*/))) {
       // integer (with internal underscore)
-      tokens.push(new Token('int', parseInt(m[0])))
+      tokens.push(new Token('int', parseInt(m[0].replace(/_/g, ''))))
     } else if ((m = s.match(/^:[a-zA-Z]+[_a-zA-Z0-9]*/))) {
       tokens.push(new Token('atom', m[0]))
     } else if ((m = s.match(/^[a-zA-Z]+[_a-zA-Z0-9]*:/))) {
@@ -103,7 +103,7 @@ class Parser {
     } else if (this.peek('%{')) {
       let m = this.map()
       return m
-    } else if (this.peek('int') | this.peek('atom') | this.peek('boolean')) {
+    } else if (this.peek('int') | this.peek('atom') | this.peek('bool')) {
       let primitive = this.primitive()
       return primitive
     } else {
@@ -237,17 +237,32 @@ const main = () => {
     33
     } #{55}`,
     6: `%{ [:a, 22] => { [1, 2, 3], :x },
-    x: [99, %{ a: 33 }]
+    x: [99, %{ a: 33 }],
  }
 
  { [1, 2], {:a, 22}, %{ a: 99, :b => 11} }
 
  [ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]
  `,
+    7: `# multiple int's with internal underscores
+
+ 123_456_789
+
+ 1_2_3
+ `,
+    8: `# single int
+
+ 1234`,
+ 9: `12_34
+ true
+ :some_long_atom_1234
+ false
+ 833_4
+ `
   }
 
   const input = fs.readFileSync(0, 'utf8')
-  // const input = tests[6]
+  // const input = tests[9]
 
   const tokens = tokenize(input)
 
