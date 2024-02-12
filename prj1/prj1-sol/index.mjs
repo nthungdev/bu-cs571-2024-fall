@@ -101,17 +101,15 @@ class Parser {
     this.token = this._nextToken() // lookahead
   }
 
-  // wrapper used for crude  error recovery
+  /**
+   * @throws can throw an error message string
+   */
   parse() {
-    try {
-      let result = this.sentences()
-      if (!this.peek('EOF')) {
-        this._handleError({ kind: 'end-of-input' })
-      }
-      return result
-    } catch (err) {
-      throw err
+    let result = this.sentences()
+    if (!this.peek('EOF')) {
+      this._handleError({ kind: 'end-of-input' })
     }
+    return result
   }
 
   sentences() {
@@ -125,17 +123,13 @@ class Parser {
 
   dataLiteral() {
     if (this.peek('[')) {
-      let l = this.list()
-      return l
+      return this.list()
     } else if (this.peek('{')) {
-      let t = this.tuple()
-      return t
+      return this.tuple()
     } else if (this.peek('%{')) {
-      let m = this.map()
-      return m
+      return this.map()
     } else if (this.peek('int') | this.peek('atom') | this.peek('bool')) {
-      let primitive = this.primitive()
-      return primitive
+      return this.primitive()
     } else {
       this._handleError({ kind: 'data-literal' })
     }
@@ -144,8 +138,10 @@ class Parser {
   list() {
     this.consume('[')
     const items = []
+    // iterate until ']'
     while (!this.peek(']')) {
       if (items.length !== 0) {
+        // expects ',' before consuming the next data-literal
         if (this.peek(',')) {
           this.consume(',')
         } else {
@@ -153,8 +149,7 @@ class Parser {
         }
       }
 
-      const dl = this.dataLiteral()
-      items.push(dl)
+      items.push(this.dataLiteral())
     }
     this.consume(']')
     return {
@@ -167,11 +162,15 @@ class Parser {
     this.consume('{')
     const items = []
     while (!this.peek('}')) {
-      const dl = this.dataLiteral()
-      items.push(dl)
-      if (this.peek(',')) {
-        this.consume(',')
+      if (items.length !== 0) {
+        if (this.peek(',')) {
+          this.consume(',')
+        } else {
+          this._handleError({ kind: ',' })
+        }
       }
+
+      items.push(this.dataLiteral())
     }
     this.consume('}')
     return {
