@@ -93,7 +93,7 @@ class Parser {
   constructor(tokens, input) {
     /** @type {string} */
     this._input = input
-    /** @type {string[]} */
+    /** @type {Token[]} */
     this._tokens = tokens
     /** @type {number} */
     this._index = 0
@@ -104,7 +104,7 @@ class Parser {
   // wrapper used for crude  error recovery
   parse() {
     try {
-      let result = this.parseLo()
+      let result = this.sentences()
       if (!this.peek('EOF')) {
         this._handleError({ kind: 'end-of-input' })
       }
@@ -114,11 +114,7 @@ class Parser {
     }
   }
 
-  parseLo() {
-    return this.sentence()
-  }
-
-  sentence() {
+  sentences() {
     let s = []
     while (!this.peek('EOF')) {
       let dl = this.dataLiteral()
@@ -241,12 +237,21 @@ class Parser {
 
   _handleError({ kind, message }) {
     const lines = this._input.split('\n')
-    const line = lines[this.token.row]
-    const spaces = Array(this.token.col - 1)
+    // if EOF, use the last token because EOF doesn't have row and col info
+    const lastToken =
+      this.token.kind === 'EOF'
+        ? this._tokens[this._tokens.length - 1]
+        : this.token
+    const line = lines[lastToken.row]
+    const spaces = Array(
+      // if error at EOF, point arrow at the end of line
+      // else point at the token
+      this.token.kind === 'EOF' ? line.length : lastToken.col - 1
+    )
       .fill(' ')
       .join('')
     const mess = kind
-      ? `expecting ${kind} at "${this.token.lexeme}"`
+      ? `expecting "${kind}" at "${lastToken.lexeme}"`
       : message ?? ''
     let errorMessage = `error: ${mess}
     ${line}
