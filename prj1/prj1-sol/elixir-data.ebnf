@@ -1,11 +1,11 @@
 program:
   : sentence
-  | sentence '\n' program
-  |
+  | sentence '\n'+ program
+  | <blank>
   ;
 sentence
   : data-literal
-  | data-literal ' ' data-literal-sequence
+  | data-literal ' '+ data-literal-sequence
   ;
 data-literal
   : list
@@ -32,7 +32,7 @@ map
   ;
 key-pair
   : data-literal '=>' data-literal
-  | key ' ' data-literal
+  | key ' '+ data-literal
   ;
 integer
   : num
