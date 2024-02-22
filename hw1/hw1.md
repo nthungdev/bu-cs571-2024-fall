@@ -61,6 +61,10 @@ expr => expr '$' expr
 
 ### 4b
 
+Below sentence can have 2 parse trees:
+
+1 $ 2 : 4
+
 ### 4c
 
 expr
@@ -83,6 +87,7 @@ expr4
 
 ### 4d
 
+### 4e
 
 ### 4f
 
@@ -183,9 +188,13 @@ a: <3,-3>
 
 ### 5c
 
+Since h() has depth 3, and x has depth 1, the compiler would follow (3 - 1 = 2) static chains to reach x's depth, then offset by -3 to retrieve it.
+
 ## 6
 
 ### 6a
+
+It is possible to support subroutine calls without using a stack. However, there are limitations: difficult to handle nested or recursive calls.
 
 ### 6b
 
@@ -193,6 +202,12 @@ Not totally valid. It is possible to write many arithmetic expressions involving
 
 ### 6c
 
-This is valid. Some notable languages: C, Java, and Perl5
+It is valid. Some notable languages: C, Java, and Perl5
 
 ### 6d
+
+It is valid. "." symbol are used in dotted pairs in Lisp. However, we can also create pairs with the cons functions.
+
+### 6e
+
+Not valid. They are likely be allocated on a heap.
