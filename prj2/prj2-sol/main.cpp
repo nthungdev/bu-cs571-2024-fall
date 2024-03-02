@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   unsigned int operationsCount = stoi(argv[1]);
   unsigned int entriesCount = stoi(argv[2]);
 
-  for (int i = 0; i < operationsCount; i++)
+  for (unsigned int i = 0; i < operationsCount; i++)
   {
     int *vector1 = new int[entriesCount];
     int *vector2 = new int[entriesCount];
