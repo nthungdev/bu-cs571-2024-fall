@@ -10,9 +10,9 @@ using namespace std;
 
 // Your program should not assume any maximum limits on N_ENTRIES beyond those dictated by available memory.
 
-void outputVector(size_t size, int *v)
+void outputVector(unsigned int size, int *v)
 {
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
   {
     cout << v[i] << ' ';
   }
