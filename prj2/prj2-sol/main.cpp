@@ -16,7 +16,7 @@ void outputVector(unsigned int size, int *v)
   {
     cout << v[i] << ' ';
   }
-  cout << '\n';
+  cout << "\n\n";
 }
 
 int main(int argc, char *argv[])
