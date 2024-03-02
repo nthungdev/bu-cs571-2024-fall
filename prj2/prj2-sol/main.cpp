@@ -13,7 +13,7 @@ void outputVector(unsigned int size, int *v)
     // }
     cout << ' ';
   }
-  cout << "\n";
+  cout << endl;
 }
 
 int main(int argc, char *argv[])
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     if (i < operationsCount - 1)
     {
-      cout << "\n";
+      cout << endl;
     }
 
     // Clean up
