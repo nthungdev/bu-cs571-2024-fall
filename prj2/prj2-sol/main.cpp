@@ -7,10 +7,11 @@ void outputVector(unsigned int size, int *v)
   for (unsigned int i = 0; i < size; i++)
   {
     cout << v[i];
-    if (i != size - 1)
-    {
-      cout << " ";
-    }
+    cout << " ";
+    // if (i != size - 1)
+    // {
+    //   cout << " ";
+    // }
   }
   cout << "\n";
 }
@@ -48,10 +49,11 @@ int main(int argc, char *argv[])
 
     outputVector(entriesCount, vector3);
 
-    if (i < operationsCount - 1)
-    {
-      cout << "\n";
-    }
+    cout << "\n";
+    // if (i < operationsCount - 1)
+    // {
+    //   cout << "\n";
+    // }
 
     // Clean up
     delete[] vector1;
