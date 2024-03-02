@@ -9,7 +9,7 @@ void outputVector(unsigned int size, int *v)
     cout << v[i];
     if (i != size - 1)
     {
-      cout << ' ';
+      cout << " ";
     }
   }
   cout << endl;
