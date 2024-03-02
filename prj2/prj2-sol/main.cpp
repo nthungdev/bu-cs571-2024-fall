@@ -29,11 +29,11 @@ int main(int argc, char *argv[])
     int *vector1 = new int[entriesCount];
     int *vector2 = new int[entriesCount];
 
-    for (int i = 0; i < entriesCount; i++)
+    for (unsigned int i = 0; i < entriesCount; i++)
     {
       cin >> vector1[i];
     }
-    for (int i = 0; i < entriesCount; i++)
+    for (unsigned int i = 0; i < entriesCount; i++)
     {
       cin >> vector2[i];
     }
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     outputVector(entriesCount, vector2);
 
     // Calculate the sum and output
-    for (int i = 0; i < entriesCount; i++)
+    for (unsigned int i = 0; i < entriesCount; i++)
     {
       vector3[i] = vector1[i] + vector2[i];
     }
