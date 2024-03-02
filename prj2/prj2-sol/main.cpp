@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+
 using namespace std;
 
 void outputVector(unsigned int size, int *v)
