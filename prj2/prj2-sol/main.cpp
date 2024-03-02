@@ -2,21 +2,17 @@
 #include <string>
 using namespace std;
 
-// Your program must allocate memory for the two addend vectors and the sum vector on the heap. (The use of C's variable-length arrays VLAs is not acceptable).
-
-// All memory dynamically allocated by your code must be explicitly released before program termination.
-
-// The sum must first be computed into the sum vector before being written to standard output.
-
-// Your program should not assume any maximum limits on N_ENTRIES beyond those dictated by available memory.
-
 void outputVector(unsigned int size, int *v)
 {
   for (unsigned int i = 0; i < size; i++)
   {
-    cout << v[i] << ' ';
+    cout << v[i];
+    if (i != size - 1)
+    {
+      cout << ' ';
+    }
   }
-  cout << "\n\n";
+  cout << "\n";
 }
 
 int main(int argc, char *argv[])
@@ -51,6 +47,11 @@ int main(int argc, char *argv[])
     }
 
     outputVector(entriesCount, vector3);
+
+    if (i < operationsCount - 1)
+    {
+      cout << "\n";
+    }
 
     // Clean up
     delete[] vector1;
