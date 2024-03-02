@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
 
     int *vector3 = new int[entriesCount];
 
-    // Print the data for verification
-    outputVector(entriesCount, vector1);
-    outputVector(entriesCount, vector2);
+    // // Print the data for verification
+    // outputVector(entriesCount, vector1);
+    // outputVector(entriesCount, vector2);
 
     // Calculate the sum and output
     for (unsigned int i = 0; i < entriesCount; i++)
