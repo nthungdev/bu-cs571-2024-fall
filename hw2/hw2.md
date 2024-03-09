@@ -47,3 +47,20 @@ offset 202
 offset 154
 
 ## 4
+
+Check for the number of leading 1's in the byte pointed by p.
+
+If it starts with 10, then this is one of the continuation bytes in the byte array. Skip to the preceding byte and continue checking.
+
+Else, the number of leading 1's indicates the total number of bytes in the byte array.
+
+Now we are at the start of the array and we know how long the array spans, we can convert to Unicode character.
+
+## 5
+
+Arithmetic overflow in C is undefined behavior, there could be 2 possibility:
+
+1. Results in a wrapped around value. In this case we can check whether k is less than either i or j or not. If it does, then we have overflow.
+2. Results in a negative number. In this case we can check whether k is < 0 or not. If it does, then we have overflow.
+
+## 6
