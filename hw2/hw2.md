@@ -64,3 +64,36 @@ Arithmetic overflow in C is undefined behavior, there could be 2 possibility:
 2. Results in a negative number. In this case we can check whether k is < 0 or not. If it does, then we have overflow.
 
 ## 6
+
+### 6a C
+
+For data structure, I would define a struct AstNode that contains 2 pointers to the left and right children AstNode nodes.
+
+To make sure the memory allocation of all nodes of an AST is reclaimed correctly, I would use recursive tree traversal strategy.
+
+freeAst(struct AstNode* node) {
+  if (node == null) {
+    return;
+  }
+  freeAst(node->left);
+  freeAst(node->right);
+  free(node);
+}
+
+### 6b C++
+
+For data structure, I would define a struct AstNode that contains 2 unique_ptr<AstNode> to the left and right children AstNode.
+
+Since we're using smart pointer unique_ptr, when the smart pointer runs out-of-scope, the memory is reclaimed automatically.
+
+### 6c Rust
+
+Rust has an ownership and borrowing system, so memory management is handled automatically. The data structure of AstNode would be a struct containing 2 references to the left and right children AstNode.
+
+## 7
+
+## 8
+
+## 9
+
+
