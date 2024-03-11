@@ -98,9 +98,16 @@ Then iterate using a for loop to access the value of each byte of the double. (I
 
 ## 8
 
+### 8a
 
+We would use extra memory for pointer storage. If we have n rows, we would have n pointers allocated, while VLAs wouldn't.
+
+### 8b
+
+Higher time cost due to extra indirections involved in access. It also takes extra time to pointer dereference when accessing elements.
 
 ## 9
 
-
-
+In the last iteration of the loop,
+i = 10, and where accessing a value outside of the array a of size 10. This is an undefined behavior.
+Accidentally, the value being updated can be i itself, which resets the loop. Causing an infinite loop.
