@@ -92,8 +92,15 @@ Rust has an ownership and borrowing system, so memory management is handled auto
 
 ## 7
 
+I would define an unsigned char pointer pointing to the double (will need to typecast the double to unsigned char when assigning). I use unsigned char because it has size of 1 byte.
+
+Then iterate using a for loop to access the value of each byte of the double. (Increment the unsigned char pointer at the end of each iteration).
+
 ## 8
 
+
+
 ## 9
+
 
 
