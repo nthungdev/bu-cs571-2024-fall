@@ -30,7 +30,7 @@ testToSingletonLists = do
 -- Return a list containing f a b for each element b in list.
 -- Hint: use the map function or a list comprehension
 listMap :: (a -> b -> c) -> a -> [b] -> [c]
-listMap _ _ _ = error "TODO"
+listMap a b c = map (\x -> b `a` x) c
 
 testListMap = do
   print "******* listMap"
@@ -99,7 +99,7 @@ testSelectNApart = do
 --   Skip:  skip these tests.
 allTests = [
     (Run testToSingletonLists),
-    (Skip testListMap),
+    (Run testListMap),
     (Skip testMember),
     (Skip testSelectNApart),
     (Skip testEvalIntExpr),
