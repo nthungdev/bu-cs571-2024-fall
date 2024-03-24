@@ -14,7 +14,7 @@ import Test.QuickCheck
 -- a list of singleton lists [e].  *Must use map*.
 -- Hint: use map with a section.
 toSingletonLists :: [e] -> [[e]]
-toSingletonLists _ = error "TODO"
+toSingletonLists xs = map (\x -> [x]) xs
 
 testToSingletonLists = do
   print "******* toSingletonLists"
@@ -98,7 +98,7 @@ testSelectNApart = do
 --   Run:   run these tests when no tests are marked Only.
 --   Skip:  skip these tests.
 allTests = [
-    (Skip testToSingletonLists),
+    (Run testToSingletonLists),
     (Skip testListMap),
     (Skip testMember),
     (Skip testSelectNApart),
@@ -114,4 +114,4 @@ main = do
   where
     only = onlyTests allTests
     tests = if (length only > 0) then only else runTests allTests
-  
+
