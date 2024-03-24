@@ -104,7 +104,7 @@ allTests = [
     (Run testSelectNApart),
     (Run testEvalIntExpr),
     (Run testEvalIdExpr),
-    (Only testEvalMaybeExpr),
+    (Run testEvalMaybeExpr),
     (Skip testPostfixExpr)
   ]
 

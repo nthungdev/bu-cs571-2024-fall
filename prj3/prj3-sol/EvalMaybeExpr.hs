@@ -15,14 +15,29 @@ data MaybeExpr =
 type Assoc a = [ (String, a) ]
 
 -- return a Maybe wrapping the results of evaluating expr, looking up
--- id's in assoc.  If an id is not found in assoc, then the function
+-- id's in assoc. If an id is not found in assoc, then the function
 -- should return Nothing. Hint: use Data.List.assoc imported above
 -- and do notation.
 evalMaybeExpr :: MaybeExpr -> Assoc Int -> Maybe Int
-evalMaybeExpr _ _ = error "TODO"
+evalMaybeExpr (Id i) ass = lookup i ass
+evalMaybeExpr (Leaf i) ass = Just i
+evalMaybeExpr (Add a b) ass = do
+  val1 <- evalMaybeExpr a ass
+  val2 <- evalMaybeExpr b ass
+  Just (val1 + val2)
+evalMaybeExpr (Sub a b) ass = do
+  val1 <- evalMaybeExpr a ass
+  val2 <- evalMaybeExpr b ass
+  Just (val1 - val2)
+evalMaybeExpr (Mul a b) ass = do
+  val1 <- evalMaybeExpr a ass
+  val2 <- evalMaybeExpr b ass
+  Just (val1 * val2)
+evalMaybeExpr (Uminus a) ass = do
+  val <- evalMaybeExpr a ass
+  Just (-val)
 
-
-testEvalMaybeExpr = do 
+testEvalMaybeExpr = do
   print "*** test evalMaybeExpr"
   -- unit tests
   quickCheck $ counterexample "Leaf" $ evalMaybeExpr (Leaf 42) [] == Just 42
@@ -60,20 +75,20 @@ testEvalMaybeExpr = do
     (\ id1 val1 -> evalMaybeExpr (Id id1) [(id1, val1)] == Just val1)
   quickCheck $ counterexample "random id lookup fail" $
     (\ id1 val1 -> evalMaybeExpr (Id id1) [(id1 ++ "x", val1)] == Nothing)
-  
+
   -- property-based tests
   -- commutativity
   quickCheck $ counterexample "e1 + e2 == e2 + e1" $
-    (\ e1 e2 -> 
+    (\ e1 e2 ->
         evalMaybeExpr (Add (Leaf e1) (Leaf e2)) [] ==
         evalMaybeExpr (Add (Leaf e2) (Leaf e1)) [])
   quickCheck $ counterexample "e1 * e2 == e2 * e1" $
-    (\ e1 e2 -> 
+    (\ e1 e2 ->
         evalMaybeExpr (Mul (Leaf e1) (Leaf e2)) [] ==
         evalMaybeExpr (Mul (Leaf e2) (Leaf e1)) [])
   -- associativity
   quickCheck $ counterexample "(e1 + e2) + e3 == e1 + (e2 + e3)" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalMaybeExpr (Add (Add (Leaf e1) (Leaf e2)) (Leaf e3)) [] ==
         evalMaybeExpr (Add (Leaf e1) (Add (Leaf e2) (Leaf e3))) [])
   quickCheck $ counterexample "(e1 * e2) * e3 == e1 * (e2 * e3)" $
@@ -89,12 +104,12 @@ testEvalMaybeExpr = do
 
   -- distributivity
   quickCheck $ counterexample "e1 * (e2 + e3) == e1*e2 + e1*e3" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalMaybeExpr (Mul (Leaf e1) (Add (Leaf e2) (Leaf e3))) [] ==
-        evalMaybeExpr (Add (Mul (Leaf e1) (Leaf e2)) 
+        evalMaybeExpr (Add (Mul (Leaf e1) (Leaf e2))
                      (Mul (Leaf e1) (Leaf e3))) [])
   quickCheck $ counterexample "e1 * (e2 - e3) == e1*e2 - e1*e3" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalMaybeExpr (Mul (Leaf e1) (Sub (Leaf e2) (Leaf e3))) [] ==
-        evalMaybeExpr (Sub (Mul (Leaf e1) (Leaf e2))  
+        evalMaybeExpr (Sub (Mul (Leaf e1) (Leaf e2))
                       (Mul (Leaf e1) (Leaf e3))) [])
