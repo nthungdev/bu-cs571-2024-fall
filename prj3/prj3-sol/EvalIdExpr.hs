@@ -22,8 +22,15 @@ type Assoc v = [ (String, v) ]
 -- value should default to 0.
 -- Hint: use Data.List.lookup imported above.
 evalIdExpr :: IdExpr -> Assoc Int -> Int
-evalIdExpr _ = error "TODO"
-
+evalIdExpr (Id i) ass =
+  case lookup i ass of
+    Just value -> value
+    Nothing -> 0
+evalIdExpr (Leaf i) ass = i
+evalIdExpr (Add a b) ass = evalIdExpr a ass + evalIdExpr b ass
+evalIdExpr (Sub a b) ass = evalIdExpr a ass - evalIdExpr b ass
+evalIdExpr (Mul a b) ass = evalIdExpr a ass * evalIdExpr b ass
+evalIdExpr (Uminus a) ass = - evalIdExpr a ass
 
 testEvalIdExpr = do
   print "*** test evalIdExpr"
@@ -63,20 +70,20 @@ testEvalIdExpr = do
     (\ id1 val1 -> evalIdExpr (Id id1) [(id1, val1)] == val1)
   quickCheck $ counterexample "random id lookup fail" $
     (\ id1 val1 -> evalIdExpr (Id id1) [(id1 ++ "x", val1)] == 0)
-  
+
   -- property-based tests
   -- commutativity
   quickCheck $ counterexample "e1 + e2 == e2 + e1" $
-    (\ e1 e2 -> 
+    (\ e1 e2 ->
         evalIdExpr (Add (Leaf e1) (Leaf e2)) [] ==
         evalIdExpr (Add (Leaf e2) (Leaf e1)) [])
   quickCheck $ counterexample "e1 * e2 == e2 * e1" $
-    (\ e1 e2 -> 
+    (\ e1 e2 ->
         evalIdExpr (Mul (Leaf e1) (Leaf e2)) [] ==
         evalIdExpr (Mul (Leaf e2) (Leaf e1)) [])
   -- associativity
   quickCheck $ counterexample "(e1 + e2) + e3 == e1 + (e2 + e3)" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalIdExpr (Add (Add (Leaf e1) (Leaf e2)) (Leaf e3)) [] ==
         evalIdExpr (Add (Leaf e1) (Add (Leaf e2) (Leaf e3))) [])
   quickCheck $ counterexample "(e1 * e2) * e3 == e1 * (e2 * e3)" $
@@ -92,14 +99,14 @@ testEvalIdExpr = do
 
   -- distributivity
   quickCheck $ counterexample "e1 * (e2 + e3) == e1*e2 + e1*e3" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalIdExpr (Mul (Leaf e1) (Add (Leaf e2) (Leaf e3))) [] ==
-        evalIdExpr (Add (Mul (Leaf e1) (Leaf e2)) 
+        evalIdExpr (Add (Mul (Leaf e1) (Leaf e2))
                      (Mul (Leaf e1) (Leaf e3))) [])
   quickCheck $ counterexample "e1 * (e2 - e3) == e1*e2 - e1*e3" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalIdExpr (Mul (Leaf e1) (Sub (Leaf e2) (Leaf e3))) [] ==
-        evalIdExpr (Sub (Mul (Leaf e1) (Leaf e2))  
+        evalIdExpr (Sub (Mul (Leaf e1) (Leaf e2))
                       (Mul (Leaf e1) (Leaf e3))) [])
-  
+
 
