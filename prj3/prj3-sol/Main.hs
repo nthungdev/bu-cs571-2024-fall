@@ -105,7 +105,7 @@ allTests = [
     (Run testEvalIntExpr),
     (Run testEvalIdExpr),
     (Run testEvalMaybeExpr),
-    (Skip testPostfixExpr)
+    (Run testPostfixExpr)
   ]
 
 

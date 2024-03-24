@@ -51,7 +51,14 @@ data PostfixExpr =
 --    + When there are no unprocessed tokens, the stack should contain
 --      a single PostfixExpr containing the value to be returned.
 postfixExpr :: String -> PostfixExpr
-postfixExpr _ = error "TODO"
+postfixExpr postfix = head $ foldl evalPostfixExpr [] (words postfix)
+
+evalPostfixExpr :: [PostfixExpr] -> String -> [PostfixExpr]
+evalPostfixExpr (x:y:xs) "+" = (Add y x):xs
+evalPostfixExpr (x:y:xs) "-" = (Sub y x):xs
+evalPostfixExpr (x:y:xs) "*" = (Mul y x):xs
+evalPostfixExpr (x:xs) "uminus" = (Uminus x):xs
+evalPostfixExpr xs numStr = (Leaf (read numStr :: Int)):xs
 
 testPostfixExpr = do
   print "******* test postfixExpr"
@@ -70,7 +77,7 @@ testPostfixExpr = do
     (Mul
      (Leaf 4)
      (Sub (Add (Leaf 3) (Uminus (Leaf 33))) (Leaf 20)))
-  
 
 
-  
+
+
