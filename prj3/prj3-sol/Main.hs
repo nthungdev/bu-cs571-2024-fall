@@ -46,7 +46,7 @@ testListMap = do
 -- Hint: define folding function using a lambda or local let/where definition;
 -- also see definition of member in slides.
 member :: Eq e => e -> [e] -> Bool
-member _ _ = error "TODO"
+member a b = foldl (\acc x -> acc || a == x) False b
 
 testMember = do
   print "******* member"
@@ -100,7 +100,7 @@ testSelectNApart = do
 allTests = [
     (Run testToSingletonLists),
     (Run testListMap),
-    (Skip testMember),
+    (Run testMember),
     (Skip testSelectNApart),
     (Skip testEvalIntExpr),
     (Skip testEvalIdExpr),
