@@ -14,8 +14,12 @@ data IntExpr =
 -- evalIntExpr returns the Int result of evaluating the IntExpr
 -- expression-tree given by its argument.
 evalIntExpr :: IntExpr -> Int
-evalIntExpr _ = error "TODO"
-
+-- evalIntExpr _ = error "TODO"
+evalIntExpr (Leaf i) = i
+evalIntExpr (Add a b) = evalIntExpr a + evalIntExpr b
+evalIntExpr (Sub a b) = evalIntExpr a - evalIntExpr b
+evalIntExpr (Mul a b) = evalIntExpr a * evalIntExpr b
+evalIntExpr (Uminus a) = - evalIntExpr a
 
 testEvalIntExpr = do
   print "******* test evalIntExpr"
@@ -37,16 +41,16 @@ testEvalIntExpr = do
   -- property-based tests
   -- commutativity
   quickCheck $ counterexample "e1 + e2 == e2 + e1" $
-    (\ e1 e2 -> 
+    (\ e1 e2 ->
         evalIntExpr (Add (Leaf e1) (Leaf e2)) ==
         evalIntExpr (Add (Leaf e2) (Leaf e1)))
   quickCheck $ counterexample "e1 * e2 == e2 * e1" $
-    (\ e1 e2 -> 
+    (\ e1 e2 ->
         evalIntExpr (Mul (Leaf e1) (Leaf e2)) ==
         evalIntExpr (Mul (Leaf e2) (Leaf e1)))
   -- associativity
   quickCheck $ counterexample "(e1 + e2) + e3 == e1 + (e2 + e3)" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalIntExpr (Add (Add (Leaf e1) (Leaf e2)) (Leaf e3)) ==
         evalIntExpr (Add (Leaf e1) (Add (Leaf e2) (Leaf e3))))
   quickCheck $ counterexample "(e1 * e2) * e3 == e1 * (e2 * e3)" $
@@ -62,16 +66,16 @@ testEvalIntExpr = do
 
   -- distributivity
   quickCheck $ counterexample "e1 * (e2 + e3) == e1*e2 + e1*e3" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalIntExpr (Mul (Leaf e1) (Add (Leaf e2) (Leaf e3))) ==
-        evalIntExpr (Add (Mul (Leaf e1) (Leaf e2)) 
+        evalIntExpr (Add (Mul (Leaf e1) (Leaf e2))
                       (Mul (Leaf e1) (Leaf e3))))
   quickCheck $ counterexample "e1 * (e2 - e3) == e1*e2 - e1*e3" $
-    (\ e1 e2 e3 -> 
+    (\ e1 e2 e3 ->
         evalIntExpr (Mul (Leaf e1) (Sub (Leaf e2) (Leaf e3))) ==
-        evalIntExpr (Sub (Mul (Leaf e1) (Leaf e2)) 
+        evalIntExpr (Sub (Mul (Leaf e1) (Leaf e2))
                       (Mul (Leaf e1) (Leaf e3))))
-  
 
 
-  
+
+

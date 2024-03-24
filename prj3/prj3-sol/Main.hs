@@ -102,7 +102,7 @@ allTests = [
     (Run testListMap),
     (Run testMember),
     (Run testSelectNApart),
-    (Skip testEvalIntExpr),
+    (Run testEvalIntExpr),
     (Skip testEvalIdExpr),
     (Skip testEvalMaybeExpr),
     (Skip testPostfixExpr)
