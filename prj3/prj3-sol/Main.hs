@@ -62,8 +62,8 @@ testMember = do
 -- containing the elements of the list at index 0, n, 2n, 3n, 4n, ...
 -- Hint: use drop
 selectNApart :: Int -> [e] -> [e]
-selectNApart _ _ = error "TODO"
-
+selectNApart _ [] = []
+selectNApart n xs = head xs : selectNApart n (drop n xs)
 
 testSelectNApart = do
   print "******* selectNApart"
@@ -101,7 +101,7 @@ allTests = [
     (Run testToSingletonLists),
     (Run testListMap),
     (Run testMember),
-    (Skip testSelectNApart),
+    (Run testSelectNApart),
     (Skip testEvalIntExpr),
     (Skip testEvalIdExpr),
     (Skip testEvalMaybeExpr),
