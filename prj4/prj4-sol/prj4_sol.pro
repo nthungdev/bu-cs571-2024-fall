@@ -469,7 +469,6 @@ named_expr_eval(mul(X, Y), Val) :-
     named_expr(mul(X, Y), XZ * YZ),
     Val is XZ * YZ.
 
-
 :-begin_tests(named_expr_eval).
 test(int, [nondet]) :-
     named_expr_eval(42, 42).
@@ -515,9 +514,24 @@ test(mul_add_1_2_mul_3_4, [nondet]) :-
 % a list of the tokens in NamedExpr in prefix notation.
 %
 % *Hint*: use append/3.
-named_expr_to_prefix_tokens(_NamedExpr, _PrefixTokens) :- 'TODO'.
 
-:-begin_tests(named_expr_to_prefix_tokens, [blocked('TODO')]).
+named_expr_list(I, [I]) :- integer(I).
+named_expr_list(add(X, Y), [add | ListXY]) :-
+    named_expr_list(X, ListX),
+    named_expr_list(Y, ListY),
+    append(ListX, ListY, ListXY).
+named_expr_list(mul(X, Y), [mul | ListXY]) :-
+    named_expr_list(X, ListX),
+    named_expr_list(Y, ListY),
+    append(ListX, ListY, ListXY).
+
+named_expr_to_prefix_tokens(I, [I]) :- integer(I).
+named_expr_to_prefix_tokens(add(X, Y), List) :-
+    named_expr_list(add(X, Y), List).
+named_expr_to_prefix_tokens(mul(X, Y), List) :-
+    named_expr_list(mul(X, Y), List).
+
+:-begin_tests(named_expr_to_prefix_tokens).
 test(int, [nondet]) :-
     named_expr_to_prefix_tokens(42, [42]).
 
