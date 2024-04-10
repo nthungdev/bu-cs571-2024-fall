@@ -196,13 +196,14 @@ test(unbound_key, [nondet]) :-
 
 assoc_replace([], _, []).
 
+assoc_replace([I | Rest], Assoc, [I | RestZ]) :-
+    integer(I),
+    assoc_replace(Rest, Assoc, RestZ).
+
 assoc_replace([A | Rest], Assoc, [Value | RestZ]) :-
     atom(A),
     assoc_lookup(Assoc, A, Value),
     assoc_replace(Rest, Assoc, RestZ).
-
-assoc_replace([I | Rest], _, [I | Rest]) :-
-    integer(I).
 
 :-begin_tests(assoc_replace, [blocked('TODO')]).
 test(empty, [nondet]) :-
@@ -586,13 +587,16 @@ test(mul_add_1_2_mul_3_4, [nondet]) :-
 % *Restriction*: must be implemented using *only* earlier procedures;
 % cannot directly use recursion or Prolog built-ins.
 
-% op_expr_to_prefix_tokens(_OpExpr, _PrefixTokens) :- 'TODO'.
-
-op_expr_to_prefix_tokens(OpExpr, PrefixTokens) :-
+op_expr_to_prefix_tokens(OpExpr, Z) :-
     named_to_op_expr(NamedExpr, OpExpr),
-    named_expr_to_prefix_tokens(NamedExpr, PrefixTokens).
+    named_expr_to_prefix_tokens(NamedExpr, PrefixTokens),
+    assoc_replace(PrefixTokens, [(add, +), (mul, *)], Z).
 
-:-begin_tests(op_expr_to_prefix_tokens, [blocked('TODO')]).
+t(OpExpr, Z) :-
+    named_to_op_expr(NamedExpr, OpExpr),
+    named_expr_to_prefix_tokens(NamedExpr, Z).
+
+:-begin_tests(op_expr_to_prefix_tokens).
 test(int, [nondet]) :-
     op_expr_to_prefix_tokens(42, [42]).
 
