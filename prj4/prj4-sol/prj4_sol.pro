@@ -23,9 +23,8 @@
 % as List and whose elements are the lengths of the corresponding
 % sub-list in List.  You may assume that all the elements of List
 % are sub-lists.
-% sublist_lengths(_List, _Lengths) :- 'TODO'.
 sublist_lengths([], []).
-sublist_lengths([List|Rest], [Length|Lengths]) :-
+sublist_lengths([List | Rest], [Length | Lengths]) :-
     length(List, Length),
     sublist_lengths(Rest, Lengths).
 
@@ -49,9 +48,16 @@ test(sublist_lengths_var_list, [nondet]) :-
 % List are sub-lists.  The procedure should succeed for an empty List.
 %
 % *Hint*: use an auxiliary procedure.
-same_length_sublists(_List) :- 'TODO'.
 
-:-begin_tests(same_length_sublists, [blocked('TODO')]).
+same_length_sublists([]). % An empty list has elements of the same length
+same_length_sublists([_]). % A list with one element has elements of the same length
+same_length_sublists([X, Y| Rest]) :- % Compare lengths of first two elements
+    length(X, LenX),
+    length(Y, LenY),
+    LenX =:= LenY, % Check if lengths are equal
+    same_length_sublists([Y | Rest]). % Recursively check the rest of the list
+
+:-begin_tests(same_length_sublists).
 test(empty, [nondet]) :-
     same_length_sublists([]).
 test(empties, [nondet]) :-
@@ -79,9 +85,45 @@ test(sublists3_fail, [fail]) :-
 % where List[i] is the sublist at index i in List.  You may
 % assume that List contains only sublists.  The procedure
 % should trivially succeed if the length of List is < 3.
-fibonacci_sublists(_List) :- 'TODO'.
 
-:-begin_tests(fibonacci_sublists, [blocked('TODO')]).
+is_fibonacci_sequence(List) :- length(List, Length), Length < 3.
+is_fibonacci_sequence([A, B, C | Rest]) :-
+    length(A, LenA),
+    length(B, LenB),
+    length(C, LenC),
+    LenC is LenA + LenB,
+    is_fibonacci_sequence([B, C | Rest]).
+
+fibonacci_sublists(List) :- length(List, Length), Length < 3.
+fibonacci_sublists(List) :-
+    length(List, Lengths), Lengths >= 3, % Ensure the length of List is at least 3
+    is_fibonacci_sequence(List). % Check if the lengths follow a Fibonacci sequence
+
+
+% % Predicate to check if a list of lengths follows a Fibonacci sequence
+% is_fibonacci_sequence([A, B, C | Rest]) :-
+%     C is A + B, % Check if the third element is the sum of the first two
+%     is_fibonacci_sequence([B, C | Rest]). % Recursively check the rest of the list
+% is_fibonacci_sequence([_]). % Base case: Trivially succeed for lists with one or two elements
+
+% % Base case: Trivially succeed if the length of List is < 3
+% fibonacci_sublists(_List) :- length(_List, Length), Length < 3.
+
+% % Predicate to check if List is a list of sublists whose lengths have a Fibonacci relationship
+% fibonacci_sublists(_List) :-
+%     length(_List, Length), Length >= 3, % Ensure the length of List is at least 3
+%     sublist_fibonacci(_List). % Check if the lengths of sublists in List follow a Fibonacci sequence
+
+% % Auxiliary predicate to check if the lengths of sublists in List follow a Fibonacci sequence
+% sublist_fibonacci([_, _ | Rest]) :- % Base case: Trivially succeed if List has fewer than 3 sublists
+%     sublist_fibonacci_helper(Rest, 0, 0, _). % Start the helper predicate with lengths 0 and 0
+% sublist_fibonacci([]). % Base case: Trivially succeed for empty list
+% sublist_fibonacci([_]). % Base case: Trivially succeed for lists with one sublist
+
+
+
+:-begin_tests(fibonacci_sublists
+    ).
 test(empty, [nondet]) :-
     fibonacci_sublists([]).
 test(zero, [nondet]) :-
