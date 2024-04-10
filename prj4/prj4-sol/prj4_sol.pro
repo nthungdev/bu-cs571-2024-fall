@@ -296,9 +296,22 @@ test(rev_add_1_add_2_add_3_add_4_5, [nondet]) :-
 % + and * respectively.
 % It should be possible to run this procedure with either one or
 % both arguments instantiated.
-named_to_op_expr(_NamedExpr, _OpExpr) :- 'TODO'.
 
-:-begin_tests(named_to_op_expr, [blocked('TODO')]).
+named_expr(I, I) :- integer(I).
+named_expr(add(X, Y), XZ + YZ) :-
+    named_expr(X, XZ),
+    named_expr(Y, YZ).
+named_expr(mul(X, Y), XZ * YZ) :-
+    named_expr(X, XZ),
+    named_expr(Y, YZ).
+
+named_to_op_expr(I, I) :- integer(I).
+named_to_op_expr(add(X, Y), XZ + YZ) :-
+    named_expr(add(X, Y), XZ + YZ).
+named_to_op_expr(mul(X, Y), XZ * YZ) :-
+    named_expr(mul(X, Y), XZ * YZ).
+
+:-begin_tests(named_to_op_expr).
 test(int, [nondet]) :-
     NamedExpr = 42, OpExpr = 42,
     named_to_op_expr(NamedExpr, Z),
