@@ -581,16 +581,20 @@ test(mul_add_1_2_mul_3_4, [nondet]) :-
 
 % #10: 10-points
 
-% op_to_prefix_expr(OpExpr, PrefixTokens): Given a OpExpr involving
+% op_expr_to_prefix_tokens(OpExpr, PrefixTokens): Given a OpExpr involving
 % integers, + and *, set PrefixTokens to a list containing its tokens
 % in prefix notation.
 %
 % *Restriction*: must be implemented using *only* earlier procedures;
 % cannot directly use recursion or Prolog built-ins.
 
-op_expr_to_prefix_tokens(_OpExpr, _PrefixTokens) :- 'TODO'.
+% op_expr_to_prefix_tokens(_OpExpr, _PrefixTokens) :- 'TODO'.
 
-:-begin_tests(op_expr_to_prefix_tokens, [blocked('TODO')]).
+op_expr_to_prefix_tokens(OpExpr, PrefixTokens) :-
+    named_to_op_expr(NamedExpr, OpExpr),
+    named_expr_to_prefix_tokens(NamedExpr, PrefixTokens).
+
+:-begin_tests(op_expr_to_prefix_tokens).
 test(int, [nondet]) :-
     op_expr_to_prefix_tokens(42, [42]).
 
