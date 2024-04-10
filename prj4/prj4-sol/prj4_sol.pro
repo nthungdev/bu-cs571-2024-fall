@@ -23,9 +23,13 @@
 % as List and whose elements are the lengths of the corresponding
 % sub-list in List.  You may assume that all the elements of List
 % are sub-lists.
-sublist_lengths(_List, _Lengths) :- 'TODO'.
+% sublist_lengths(_List, _Lengths) :- 'TODO'.
+sublist_lengths([], []).
+sublist_lengths([List|Rest], [Length|Lengths]) :-
+    length(List, Length),
+    sublist_lengths(Rest, Lengths).
 
-:-begin_tests(sublist_lengths, [blocked('TODO')]).
+:-begin_tests(sublist_lengths).
 test(empty, [nondet]) :-
     sublist_lengths([], Lengths), Lengths = [].
 test(sublist_lengths1, [nondet]) :-
@@ -236,7 +240,7 @@ test(rev_add_add_add_add_1_2_3_4_5_fail, [fail]) :-
     Z = add(add(add(add(1, 2), 3), 4), 5).
 test(rev_add_1_add_2_add_3_add_4_5, [nondet]) :-
     add_to_plus_expr(Z, 1 + (2 + (3 + (4 + 5)))),
-    Z = add(1, add(2, add(3, add(4, 5)))).    
+    Z = add(1, add(2, add(3, add(4, 5)))).
 :-end_tests(add_to_plus_expr).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% named_to_op_expr/2 %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -279,10 +283,10 @@ test(add_add_add_add_1_2_3_4_5_fail, [fail]) :-
     Z = OpExpr.
 test(add_1_add_2_add_3_add_4_5, [nondet]) :-
     NamedExpr = add(1, add(2, add(3, add(4, 5)))),
-    OpExpr = 1 + (2 + (3 + (4 + 5))), 
+    OpExpr = 1 + (2 + (3 + (4 + 5))),
     named_to_op_expr(NamedExpr, Z),
     Z = OpExpr.
-		     
+
 
 test(mul_2_3, [nondet]) :-
     NamedExpr = mul(2, 3), OpExpr = 2 * 3,
@@ -348,10 +352,10 @@ test(rev_add_add_add_add_1_2_3_4_5_fail, [fail]) :-
     Z = NamedExpr.
 test(rev_add_1_add_2_add_3_add_4_5, [nondet]) :-
     NamedExpr = add(1, add(2, add(3, add(4, 5)))),
-    OpExpr = 1 + (2 + (3 + (4 + 5))), 
+    OpExpr = 1 + (2 + (3 + (4 + 5))),
     named_to_op_expr(Z, OpExpr),
     Z = NamedExpr.
-		     
+
 
 test(rev_mul_2_3, [nondet]) :-
     NamedExpr = mul(2, 3), OpExpr = 2 * 3,
@@ -466,7 +470,7 @@ test(add_add_add_add_1_2_3_4_5, [nondet]) :-
     named_expr_to_prefix_tokens(add(add(add(add(1, 2), 3), 4), 5),
 			 [add, add, add, add, 1, 2, 3, 4, 5]).
 test(add_add_add_add_1_2_3_4_5_fail, [fail]) :-
-    named_expr_to_prefix_tokens(add(add(add(add(1, 2), 3), 4), 5), 
+    named_expr_to_prefix_tokens(add(add(add(add(1, 2), 3), 4), 5),
 			 [add, add, add, 1, 2, 3, 4, 5]).
 test(add_1_add_2_add_3_add_4_5, [nondet]) :-
     named_expr_to_prefix_tokens(add(1, add(2, add(3, add(4, 5)))),
@@ -481,7 +485,7 @@ test(mul_mul_mul_mul_1_2_3_4_5, [nondet]) :-
     named_expr_to_prefix_tokens(mul(mul(mul(mul(1, 2), 3), 4), 5),
 			 [mul, mul, mul, mul, 1, 2, 3, 4, 5]).
 test(mul_mul_mul_mul_1_2_3_4_5_fail, [fail]) :-
-    named_expr_to_prefix_tokens(mul(mul(mul(mul(1, 2), 3), 4), 5), 
+    named_expr_to_prefix_tokens(mul(mul(mul(mul(1, 2), 3), 4), 5),
 			 [mul, mul, mul, 1, 2, 3, 4, 5]).
 test(mul_1_mul_2_mul_3_mul_4_5, [nondet]) :-
     named_expr_to_prefix_tokens(mul(1, mul(2, mul(3, mul(4, 5)))),
@@ -525,7 +529,7 @@ test(add_add_add_add_1_2_3_4_5, [nondet]) :-
     op_expr_to_prefix_tokens(+(+(+(+(1, 2), 3), 4), 5),
 			 [+, +, +, +, 1, 2, 3, 4, 5]).
 test(add_add_add_add_1_2_3_4_5_fail, [fail]) :-
-    op_expr_to_prefix_tokens(+(+(+(+(1, 2), 3), 4), 5), 
+    op_expr_to_prefix_tokens(+(+(+(+(1, 2), 3), 4), 5),
 			 [+, +, +, 1, 2, 3, 4, 5]).
 test(add_1_add_2_add_3_add_4_5, [nondet]) :-
     op_expr_to_prefix_tokens(+(1, +(2, +(3, +(4, 5)))),
@@ -540,7 +544,7 @@ test(mul_mul_mul_mul_1_2_3_4_5, [nondet]) :-
     op_expr_to_prefix_tokens(*(*(*(*(1, 2), 3), 4), 5),
 			 [*, *, *, *, 1, 2, 3, 4, 5]).
 test(mul_mul_mul_mul_1_2_3_4_5_fail, [fail]) :-
-    op_expr_to_prefix_tokens(*(*(*(*(1, 2), 3), 4), 5), 
+    op_expr_to_prefix_tokens(*(*(*(*(1, 2), 3), 4), 5),
 			 [*, *, *, 1, 2, 3, 4, 5]).
 test(mul_1_mul_2_mul_3_mul_4_5, [nondet]) :-
     op_expr_to_prefix_tokens(*(1, *(2, *(3, *(4, 5)))),
@@ -568,6 +572,6 @@ main :-
 :-initialization(main, main).
 
 
-    
 
-  
+
+
