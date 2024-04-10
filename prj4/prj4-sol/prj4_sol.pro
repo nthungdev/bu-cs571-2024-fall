@@ -194,7 +194,17 @@ test(unbound_key, [nondet]) :-
 % exercise and Prolog's built-ins atom(A) which succeeds if A is an
 % atom and integer(I) which succeeds if I is an integer.
 
-assoc_replace(_AtomIntList, _Assoc, _ListZ) :- 'TODO'.
+assoc_replace([], _, []).
+
+assoc_replace([A | Rest], Assoc, [Value | RestZ]) :-
+    atom(A),
+    assoc_lookup(Assoc, A, Value),
+    assoc_replace(Rest, Assoc, RestZ).
+
+assoc_replace([I | Rest], Assoc, [Value | RestZ]) :-
+    integer(I),
+    assoc_lookup(Assoc, I, Value),
+    assoc_replace(Rest, Assoc, RestZ).
 
 :-begin_tests(assoc_replace, [blocked('TODO')]).
 test(empty, [nondet]) :-
