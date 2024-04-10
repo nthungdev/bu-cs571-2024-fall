@@ -460,9 +460,17 @@ test(rev_mul_add_1_2_mul_3_4, [nondet]) :-
 % should add its operands and mul should multiply them).
 %
 % *Hint*: combine your solution to the previous exercise with is/2.
-named_expr_eval(_NamedExpr, _Value) :- 'TODO'.
 
-:-begin_tests(named_expr_eval, [blocked('TODO')]).
+named_expr_eval(I, I) :- integer(I).
+named_expr_eval(add(X, Y), Val) :-
+    named_expr(add(X, Y), XZ + YZ),
+    Val is XZ + YZ.
+named_expr_eval(mul(X, Y), Val) :-
+    named_expr(mul(X, Y), XZ * YZ),
+    Val is XZ * YZ.
+
+
+:-begin_tests(named_expr_eval).
 test(int, [nondet]) :-
     named_expr_eval(42, 42).
 
