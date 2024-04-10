@@ -152,9 +152,11 @@ test(four_start_22_fail, [fail]) :-
 % Key in association list Assoc.
 % *Restriction*: you may not use recursion.
 % *Hint* your solution should simply call a Prolog built-in.
-assoc_lookup(_Assoc, _Key, _Value) :- 'TODO'.
 
-:-begin_tests(assoc_lookup, [blocked('TODO')]).
+assoc_lookup(Assoc, Key, Value) :-
+    member((Key, Value), Assoc).
+
+:-begin_tests(assoc_lookup).
 test(empty, [fail]) :-
     assoc_lookup([], key, _Value).
 test(first, [nondet]) :-
