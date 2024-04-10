@@ -205,7 +205,7 @@ assoc_replace([A | Rest], Assoc, [Value | RestZ]) :-
     assoc_lookup(Assoc, A, Value),
     assoc_replace(Rest, Assoc, RestZ).
 
-:-begin_tests(assoc_replace, [blocked('TODO')]).
+:-begin_tests(assoc_replace).
 test(empty, [nondet]) :-
     assoc_replace([], [(a,22), (b, 33), (c, 42)], Z),
     Z = [].
