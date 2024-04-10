@@ -237,9 +237,17 @@ test(multi_fail, [fail]) :-
 % is the same as AddExpr with each add replaced by +.
 %
 % *Hint*: the Prolog built-in integer(I) succeeds iff I is an integer.
-add_to_plus_expr(_AddExprI, _PlusExpr) :- 'TODO'.
 
-:-begin_tests(add_to_plus_expr, [blocked('TODO')]).
+add_expr(I, I) :- integer(I).
+add_expr(add(X, Y), XZ + YZ) :-
+    add_expr(X, XZ),
+    add_expr(Y, YZ).
+
+add_to_plus_expr(I, I) :- integer(I).
+add_to_plus_expr(add(X, Y), XZ + YZ) :-
+    add_expr(add(X, Y), XZ + YZ).
+
+:-begin_tests(add_to_plus_expr).
 test(int, [nondet]) :-
     add_to_plus_expr(42, Z), Z = 42.
 test(add_2_3, [nondet]) :-
