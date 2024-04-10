@@ -1,0 +1,218 @@
+% start prolog
+$ swipl
+Welcome to SWI-Prolog...
+...
+
+% load project file
+?- ['prj4_sol.pro'].
+true.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% sublist_lengths/2 %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+?- sublist_lengths([[2], [3, 4], [], [2, 3, 3]], Lengths).
+Lengths = [1, 2, 0, 3].
+
+?- sublist_lengths([ [[a, b, c]], [[3], 4], [[[4], 4], [2, 3]] ], Lengths).
+Lengths = [1, 2, 2].
+
+?- sublist_lengths([], Lengths).
+Lengths = [].
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% same_length_sublists/1 %%%%%%%%%%%%%%%%%%%%%%%
+
+?- same_length_sublists([[1], [[2, 3, 4]], [5]]).
+true.
+
+?- same_length_sublists([[1], [2, 3, 4], [5]]).
+false.
+
+?- same_length_sublists([[], [], []]).
+true.
+
+?- same_length_sublists([[], [], [[]]]).
+false.
+
+?- same_length_sublists([[1], [x], [[]]]).
+true.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% fibonacci_sublists %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+?- fibonacci_sublists([]).
+true.
+
+?- fibonacci_sublists([[], [1]]).
+true ;
+false.
+
+?- fibonacci_sublists([[], [1], [2]]).
+true ;
+false.
+
+?- fibonacci_sublists([[], [1], [2], [3, 4]]).
+true ;
+false.
+
+?- fibonacci_sublists([[], [1], [2], [3, 4], [5, 6, 7]]).
+true ;
+false.
+
+?- fibonacci_sublists([[], [1], [2], [3, 4], [5, 6, 7, 7]]).
+false.
+
+% start fib sequence with 2, 2, ...
+?- fibonacci_sublists([[a, b], [c, d], [1, 2, 3, 4], [1, 2, 3, 4, 5, 6]]).
+true ;
+false.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% assoc_lookup/3 %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% multiple lookups succeed if there are multiple occurrences of
+% the key in the assoc list
+?- assoc_lookup([(a, 22), (b, 33), (a, 44)], a, Z).
+Z = 22 ;
+Z = 44.
+
+% lookup with both key and value uninstantiated
+?- assoc_lookup([(a, 22), (b, 33), (a, 44)], X, Z).
+X = a,
+Z = 22 ;
+X = b,
+Z = 33 ;
+X = a,
+Z = 44.
+
+% lookup with value uninstantiated
+?- assoc_lookup([(a, 22), (b, 33), (a, 44)], b, Z).
+Z = 33 ;
+false.
+
+?- assoc_lookup([(a, 22), (b, 33), (a, 44)], x, Z).
+false.
+
+?- assoc_lookup([], a, Z).
+false.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% assoc_replace/3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% note multiple replacements produced by multiple occurrences of
+% the same key in the assoc list.
+?- assoc_replace([11, a, 99, b], [(a, 22), (b, 33), (a, 44)], Z).
+Z = [11, 22, 99, 33] ;
+Z = [11, 44, 99, 33] ;
+false.
+
+% no value for c in assoc list
+?- assoc_replace([11, a, 99, c], [(a, 22), (b, 33), (a, 44)], Z).
+false.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% add_to_plus_expr/2 %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% note that prolog prints out answers in infix sugared syntax
+
+?- add_to_plus_expr(add(1, add(2, 3)), Z).
+Z = 1+(2+3).
+
+?- add_to_plus_expr(add(add(1, 2), 3), Z).
+Z = 1+2+3.
+
+?- add_to_plus_expr(add(add(1, 2), add(3, 4)), Z).
+Z = 1+2+(3+4).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% named_to_op_expr/2 %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+?- named_to_op_expr(add(mul(1, 2), mul(3, 4)), Z).
+Z = 1*2+3*4.
+
+?- named_to_op_expr(mul(add(1, 2), mul(3, 4)), Z).
+Z = (1+2)*(3*4).
+
+?- named_to_op_expr(mul(add(1, 2), add(3, mul(4, 5))), Z).
+Z = (1+2)*(3+4*5).
+
+% can run it with second argument instantiated and first uninstantiated
+?- named_to_op_expr(Z, (1+2)*(3+4*5)).
+Z = mul(add(1, 2), add(3, mul(4, 5))) ;
+false.
+
+?- named_to_op_expr(Z, 1+2+3+4*5).
+Z = add(add(add(1, 2), 3), mul(4, 5)) ;
+false.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% named_expr_eval/2 %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+?- named_expr_eval(44, Z).
+Z = 44.
+
+?- named_expr_eval(add(22, 33), Z).
+Z = 55.
+
+?- named_expr_eval(add(22, mul(2, 33)), Z).
+Z = 88.
+
+?- named_expr_eval(mul(add(1, 2), add(3, mul(4, 5))), Z).
+Z = 69.
+
+
+%%%%%%%%%%%%%%%%%%%%% named_expr_to_prefix_tokens/2 %%%%%%%%%%%%%%%%%%%%%
+
+?- named_expr_to_prefix_tokens(44, Z).
+Z = [44].
+
+?- named_expr_to_prefix_tokens(add(22, mul(2, 33)), Z).
+Z = [add, 22, mul, 2, 33].
+
+?- named_expr_to_prefix_tokens(add(mul(11, 22), add(mul(2, 33), 44)), Z).
+Z = [add, mul, 11, 22, add, mul, 2, 33, 44].
+
+%%%%%%%%%%%%%%%%%%%%%%% op_expr_to_prefix_tokens/2 %%%%%%%%%%%%%%%%%%%%%%
+
+
+?- op_expr_to_prefix_tokens(44, Z).
+Z = [44] ;
+false.
+
+?- op_expr_to_prefix_tokens(22 + 2 * 33, Z).
+Z = [+, 22, *, 2, 33] ;
+false.
+
+% same as above, but first term provided in non-sugared prolog syntax
+?- op_expr_to_prefix_tokens(+(22, *(2, 33)), Z).
+Z = [+, 22, *, 2, 33] ;
+false.
+
+% + is left-assoc
+?- op_expr_to_prefix_tokens(1 + 2 + 3 + 4 + 5, Z).
+Z = [+, +, +, +, 1, 2, 3, 4, 5] ;
+false.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Run Tests %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% run all tests
+?- run_tests.
+% PL-Unit: sublist_lengths .... passed 0.000 sec
+% PL-Unit: same_length_sublists ....... passed 0.000 sec
+% PL-Unit: fibonacci_sublists ............ passed 0.001 sec
+% PL-Unit: assoc_lookup ........ passed 0.000 sec
+% PL-Unit: assoc_replace ..... passed 0.000 sec
+% PL-Unit: add_to_plus_expr ............ passed 0.001 sec
+% PL-Unit: named_to_op_expr .............................. passed 0.001 sec
+% PL-Unit: named_expr_eval ............... passed 0.001 sec
+% PL-Unit: named_expr_to_prefix_tokens ............... passed 0.001 sec
+% PL-Unit: op_expr_to_prefix_tokens ............... passed 0.001 sec
+% All 123 tests passed
+true.
+
+% run only a specific test
+?- run_tests(op_expr_to_prefix_tokens).
+% PL-Unit: op_expr_to_prefix_tokens ............... passed 0.001 sec
+% All 15 tests passed
+true.
+
+% exit prolog
+?- halt.
+$
