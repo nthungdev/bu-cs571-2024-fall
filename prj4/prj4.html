@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Project  4</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <script type="text/javascript"
+          src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js">
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+</head>
+
+<body class=umt-article>
+    <nav id="course-nav">
+      <ul>
+      </ul>
+    </nav>
+
+    <div class="umt-content">
+      <div><section data-level="h1"><h1>Project  4</h1><p><strong>Due</strong>: Apr 13, before midnight.
+</p><p><strong>Important Reminder</strong>: As per the course
+ <a href="../../misc/academic-honesty/academic-honesty-policy.html">Academic
+Honesty Statement</a>, cheating of any kind will minimally result in your
+letter grade for the entire course being reduced by one level.
+</p><p>This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  It then hints at how
+these requirements can be met.  Finally, it describes how it can be
+submitted.
+</p><section data-level="h2"><h2>Aims</h2><p>The aims of this project are as follows:
+</p><ul><li><p>To give you more exposure to recursive programming.
+</p></li><li><p>To expose you to Prolog programming.
+</p></li></ul></section><section data-level="h2"><h2>Requirements</h2><p>Implement all the procedures specified in 
+<a href="prj4-sol/prj4_sol.pro">prj4_sol.pro</a> using swipl Prolog.  You may define auxiliary procedures
+as needed.
+</p><p>The submitted file should have all tests unblocked.
+</p><p>An example  <a href="extras/LOG?lang=prolog">LOG</a> file gives examples of the
+use of these procedures as do the tests provided in the skeleton file
+ <a href="prj4-sol/prj4_sol.pro">prj4_sol.pro.</a>
+</p><p>You are not allowed to use any non-logical features of Prolog other
+than arithmetic procedures like <code>is/2</code>, <code>=:=/2</code> or <code>=&lt;/2</code>.
+Non-logical features include the explicit cut <code>!</code>, implicit cut within
+<code>-></code>, <code>assert</code>, <code>retract</code>, <code>record</code>, etc.
+</p></section><section data-level="h2"><h2>Provided Files</h2><p>You should use the provided  <a href="prj4-sol">prj4-sol</a> directory as a
+starting point for your project by copying it into your <code>i571?/submit</code>
+directory.  It contains the following files:
+</p><dl><dt>  <a href="prj4-sol/prj4_sol.pro">prj4_sol.pro</a> </dt><dd><p>    A skeleton file which contains the specifications for the
+    procedures you are required to write as well as tests
+    for those procedures.
+</p><p>    It is worth noting that the provided test code is several tens of
+    times longer than the implementation code.  Specifically, none of
+    the procedures you are required to implement need more than around
+    10 lines of code.
+</p></dd><dt>  <a href="./prj4-sol/README">README</a></dt><dd><p>    A README file which must be submitted along with your project.  It
+    contains an initial header which you must complete (replace the
+    dummy entries with your name, B-number and email address at which
+    you would like to receive project-related email).  After the
+    header you may include any content which you would like read
+    during the grading of your project.
+</p></dd></dl><p>The  <a href="extras">extras</a> directory contains the following files:
+</p><dl><dt>  <a href="extras/LOG?lang=prolog">LOG</a> </dt><dd><p>    A sample log file.
+</p></dd></dl></section><section data-level="h2"><h2>Tests</h2><p>The  <a href="prj4-sol/prj4_sol.pro">prj4_sol.pro</a> skeleton file contains
+
+<a href="https://www.swi-prolog.org/pldoc/doc_for?object=section(%27packages/plunit.html%27)">unit tests</a> for the procedures you are required to implement.  Note
+that specifying a test as <code>nondet</code> means that the test may succeed
+with more possible answers pending.  The <code>set</code> specification specifies
+a list of all possible answers after backtracking through the test.
+</p><p>You can run the tests using Prolog's <code>run_tests/0</code> or <code>run_tests/1</code>.
+</p><pre class="hljs language-prolog">    $ prolog
+    ...
+    %load file
+    ?- ['prj4_sol.pro'].
+    true.
+
+    % run all tests using provided skeleton file
+    % where all tests are blocked
+    ?- run_tests.
+    % PL-Unit: sublist_lengths blocked: TODO
+    % PL-Unit: same_length_sublists blocked: TODO
+    % PL-Unit: fibonacci_sublists blocked: TODO
+    % PL-Unit: assoc_lookup blocked: TODO
+    % PL-Unit: assoc_replace blocked: TODO
+    % PL-Unit: add_to_plus_expr blocked: TODO
+    % PL-Unit: named_to_op_expr blocked: TODO
+    % PL-Unit: named_expr_eval blocked: TODO
+    % PL-Unit: named_expr_to_prefix_tokens blocked: TODO
+    % PL-Unit: op_expr_to_prefix_tokens blocked: TODO
+    % No tests to run
+    true.
+
+    % ... develop ...
+
+    % run all tests after completing project
+    ?- run_tests.
+    % PL-Unit: sublist_lengths ....  passed 0.000 sec
+    % PL-Unit: same_length_sublists ....... ...
+    % PL-Unit: fibonacci_sublists ............  ...
+    % PL-Unit: assoc_lookup ........ passed 0.000 sec
+    % PL-Unit: assoc_replace ..... passed 0.000 sec
+    % PL-Unit: add_to_plus_expr ............ passed 0.001 sec
+    % PL-Unit: named_to_op_expr ............. ...
+    % PL-Unit: named_expr_eval ............... passed 0.001 sec
+    % PL-Unit: named_expr_to_prefix_tokens .... ...
+    % PL-Unit: op_expr_to_prefix_tokens ....... ...
+    % All 123 tests passed
+    true.
+
+    % run tests only for a specific procedure
+    ?- run_tests(op_expr_to_prefix_tokens).
+    % PL-Unit: op_expr_to_prefix_tokens ........ ...
+    % All 15 tests passed
+    true.
+
+    % terminate prolog
+    ?- halt.
+    $
+</pre><p>You can also run the tests directly from the Unix command line:
+by running your implementation file as a script:
+</p><pre class="hljs language-sh">    # ensure in project directory
+    $ cd ~/i571?/submit/prj4-sol
+
+    # run all tests
+    $ ./prj4_sol.pro
+    % PL-Unit: sublist_lengths .... passed 0.000 sec
+    % PL-Unit: same_length_sublists ... ...
+    ...
+    % PL-Unit: op_expr_to_prefix_tokens .... ...
+    % All 123 tests passed
+
+    # run selected tests
+    $ ./prj4_sol.pro op_expr_to_prefix_tokens
+    % PL-Unit: op_expr_to_prefix_tokens ..... ...
+    % All 15 tests passed
+    $
+</pre></section><section data-level="h2"><h2>Hints</h2><p>The following points are worth noting:
+</p><ul><li><p>Review the class  <a href="../../slides/prolog/prolog.html">Prolog
+    slides</a>.  In particular, review the slides on
+     <a href="../../slides/prolog/prolog.html#heuristics">Prolog
+    Programming Heuristics</a>.
+</p></li><li><p>If you do not understand the specs for a procedure, please look at
+    the tests or  <a href="extras/LOG?lang=prolog">LOG</a> for examples of the
+    expected use of the procedure.
+</p></li><li><p>Each procedure <code>proc</code> that you are required to write has a skeleton
+    rule of the form:
+</p><pre class="hljs language-prolog">    proc(_Arg1Name, ...) :- 'TODO'.
+</pre><p>    Replace this skeleton line with facts and rules for the procedure.
+</p></li><li><p>The tests provided in the skeleton file are currently blocked.
+    To run the tests for an individual procedure, unblock the
+    tests by removing the <code>blocked('TODO')</code> argument.
+</p></li></ul><ul><li><p>Since there are no types or declarations in Prolog, it is very
+    easy to have a bug resulting from a typo in a variable name.
+    Prolog tries to prevent this by generating warnings about
+    <strong>singleton variables</strong>; i.e, any variable which occurs only once
+    within a Prolog rule.  For example, the rule
+</p><pre class="hljs language-prolog">    member(X, [Element|Elements]) :-
+      member(X, Elements).
+</pre><p>    would produce a warning that <code>Element</code> is a singleton variable.
+</p><p>    If the singleton variable is intentional, then the warning can be
+    avoided by replacing the name with one starting with an underscore
+    <code>_</code>, as in the code shown below:
+</p><pre class="hljs language-prolog">    member(X, [_Element|Elements]) :-
+      member(X, Elements).
+</pre></li><li><p>Prolog has a pretty powerful
+    
+    <a href="https://www.swi-prolog.org/pldoc/man?section=debugger">debugging model</a>.  You can turn on tracing using
+    <code>trace/0</code> or <code>trace/1</code> and turn it off using <code>nodebug/0</code>, spying on
+    a particular procedure using <code>spy/1</code> and turn off using <code>nospy/1</code>
+    of <code>nospyall</code>.  If running within a
+    graphical environment, you can turn on
+     <a href="https://www.swi-prolog.org/pldoc/man?section=guitracer">GUI
+    debugging</a> using <code>gtrace</code>.
+</p></li></ul></section><section data-level="h2"><h2>Submission</h2><p>Before submitting your project, update your README to specify the
+status of your project.  Document any known issues.
+</p><p>Submit using a procedure similar to that used in your previous project.
+[As usual, gradescope will be set up early next week].
+</p></section></section></div>
+    </div>
+
+    <script type="module" src="../../assets/scripts/slide-controls.mjs"></script>
+    <script type="module" src="../../assets/scripts/nav.mjs"></script> 
+    <script type="module" src="../../assets/scripts/highlight.mjs"></script>
+</body>
+</html>
+
