@@ -15,8 +15,8 @@
 -define(test_non_rec_poly_eval, enabled).
 -define(test_tuple_poly_eval, enabled).
 -define(test_assoc_lookup, enabled).
--if(false).
 -define(test_id_poly_eval, enabled).
+-if(false).
 -define(test_server_fn, enabled).
 -endif.
 
@@ -204,8 +204,16 @@ assoc_lookup_test_() ->
 % of numbers and then call any one of the solutions to the two
 % previous exercises.  Use a local auxiliary function to convert
 % an element of IdCoeffs to a number.
-id_poly_eval(_Assoc, _IdCoeffs, _X) ->
-    'TODO'.
+
+id_poly_eval_coeff(Assoc, ({K, C})) ->
+  case K of
+      num -> C;
+      id -> assoc_lookup_0(C, Assoc)
+  end.
+
+id_poly_eval(Assoc, IdCoeffs, X) ->
+  Coeffs = [id_poly_eval_coeff(Assoc, C) || C <- IdCoeffs],
+  non_rec_poly_eval(Coeffs, X).
 
 
 -ifdef(test_id_poly_eval).
