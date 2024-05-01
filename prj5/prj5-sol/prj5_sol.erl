@@ -11,8 +11,8 @@
 %% The skeleton file is distributed with all tests deactivated
 %% by being enclosed within if(false) ... endif directives.
 
--if(false).  
 -define(test_rec_poly_eval, enabled).
+-if(false).
 -define(test_non_rec_poly_eval, enabled).
 -define(test_tuple_poly_eval, enabled).
 -define(test_assoc_lookup, enabled).
@@ -35,9 +35,14 @@
 %
 % *Restriction*: Your implementation is required to be tail-recursive.
 % *Hint*: Use an auxiliary function.
-rec_poly_eval(_Coeffs, _X) ->
-    'TODO'.
 
+rec_poly_eval(Coeffs, X) ->
+    rec_poly_eval(Coeffs, X, 0, 0).
+
+rec_poly_eval([], _X, _P, Acc) ->
+    Acc;
+rec_poly_eval([Coeff | Rest], X, P, Acc) ->
+    rec_poly_eval(Rest, X, P + 1, Acc + Coeff * math:pow(X, P)).
 
 -ifdef(test_rec_poly_eval).
 rec_poly_eval_test_() -> [
@@ -130,7 +135,7 @@ tuple_poly_eval_test_() -> [
 % to pattern-match on the result.
 assoc_lookup(_Key, _Assoc, _DefaultFn) ->
     'TODO'.
-    
+
 
 % Lookup the Value of Key in assoc list Assoc list containing
 % { Key, Value } pairs.  If not found, return 0.
@@ -138,10 +143,10 @@ assoc_lookup(_Key, _Assoc, _DefaultFn) ->
 % Hint: wrap assoc_lookup.
 assoc_lookup_0(_Key, _Assoc) ->
     'TODO'.
-				     
+
 % Lookup the Value of Key in assoc list Assoc list containing
 % { Key, Value } pairs.  If not found, throw an exception
-% of the form { not_found Msg } where Msg is a string 
+% of the form { not_found Msg } where Msg is a string
 % describing the error  (can be built using something like
 % format("key ~p not found", [Key]) ).
 %
@@ -150,7 +155,7 @@ assoc_lookup_throw(_Key, _Assoc) ->
     'TODO'.
 
 -ifdef(test_assoc_lookup).
-assoc_lookup_test_() -> 
+assoc_lookup_test_() ->
     Assoc = [ {a, 22}, {b, 33}, {a, 44}, {b, 55}, {c, 66} ],
     [ { "find_first_0", ?_assert(assoc_lookup_0(a, Assoc) =:= 22) },
       { "find_mid_0", ?_assert(assoc_lookup_0(b, Assoc) =:= 33) },
@@ -159,10 +164,10 @@ assoc_lookup_test_() ->
       { "find_first_throw", ?_assert(assoc_lookup_throw(a, Assoc) =:= 22) },
       { "find_mid_throw", ?_assert(assoc_lookup_throw(b, Assoc) =:= 33) },
       { "find_last_throw", ?_assert(assoc_lookup_throw(c, Assoc) =:= 66) },
-      { "find_fail_throw", 
+      { "find_fail_throw",
 	?_assertThrow({not_found, _}, assoc_lookup_throw(e, Assoc)) }
     ].
-  
+
 -endif.
 
 
@@ -224,7 +229,7 @@ id_poly_eval_test_() ->
 %    { self(), set_assoc } reply to ClientPid and recurse with Assoc
 %    set to Assoc1 and Coeffs unchanged.
 %
-%    { ClientPid, set_coeffs, Coeffs1 }: the server should send a 
+%    { ClientPid, set_coeffs, Coeffs1 }: the server should send a
 %    { self(), set_coeffs } reply to ClientPid and recurse with Assoc
 %    unchanged and Coeffs set to Coeffs1.
 %
@@ -233,21 +238,21 @@ id_poly_eval_test_() ->
 %    { self(), eval, Result } reply to ClientPid and recurse with
 %    Assoc and Coeffs unchanged.
 %
-%    Any other message Msg : 
-%      Use io:format(standard_error, "unknown message ~p~n", [ Msg ]) 
+%    Any other message Msg :
+%      Use io:format(standard_error, "unknown message ~p~n", [ Msg ])
 %      to log an error on standard error and recurse with both Assoc and
 %      Coeffs unchanged.
 
 server_fn(_Assoc, _Coeffs) ->
     'TODO'.
-			
+
 -ifdef(test_server_fn).
 
 server_set_assoc(Pid, Assoc) ->
     Pid ! { self(), set_assoc, Assoc },
     receive
 	{ Pid, X } ->
-	    X 
+	    X
     end.
 
 server_set_coeffs(Pid, Coeffs) ->
@@ -262,7 +267,7 @@ server_eval(Pid, X) ->
     receive
 	{ Pid, eval, Z } ->
 	    Z
-    end.    
+    end.
 
 server_fn_test_() ->
     Assoc1 = [{a, 42}, {b, 2}, {c, 3}, {d, 4}, {x, -1}, {y, -2}, {z, -3}],
@@ -277,17 +282,17 @@ server_fn_test_() ->
        fun (Pid) -> Pid ! { self(), stop }, ok end,
 
        % return tests for server at Pid.
-       fun (Pid) -> 
+       fun (Pid) ->
          [
 	  { "a_0", ?_assert(42.0 == server_eval(Pid, 0)) },
 	  { "a_1", ?_assert(46 == server_eval(Pid, 1)) },
 	  { "a_4", ?_assert(262 == server_eval(Pid, 4)) },
-	  
+
 	  { "ch_assoc_b", ?_assert(set_assoc == server_set_assoc(Pid, Assoc2)) },
 	  { "b_0", ?_assert(2 == server_eval(Pid, 0)) },
 	  { "b_1", ?_assert(13 == server_eval(Pid, 1)) },
 	  { "b_4", ?_assert(262 == server_eval(Pid, 4)) },
-	  
+
 	  { "ch_coeffs_c", ?_assert(set_coeffs ==
 	                            server_set_coeffs(Pid, Coeffs2)) },
 	  { "c_0", ?_assert(5 == server_eval(Pid, 0)) },
@@ -303,9 +308,9 @@ server_fn_test_() ->
 	 ]
        end
      }.
-	        
--endif. % test_server_fn			
-			    
+
+-endif. % test_server_fn
+
 
 %------------------------------ Utilities -------------------------------
 
@@ -320,8 +325,8 @@ format(Fmt, ArgsList) ->
 
 % DEBUGGING.
 % Use the ?debugFmt(Fmt, ArgsList) macro to produce debugging output
-% when running tests.  For example, 
-%    ?debugFmt("values are ~p and ~p", [22, {a, 33}]) 
+% when running tests.  For example,
+%    ?debugFmt("values are ~p and ~p", [22, {a, 33}])
 % will output the line
 %    values are 22 and {a,33}
 
