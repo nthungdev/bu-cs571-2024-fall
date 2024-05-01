@@ -14,8 +14,8 @@
 -define(test_rec_poly_eval, enabled).
 -define(test_non_rec_poly_eval, enabled).
 -define(test_tuple_poly_eval, enabled).
--if(false).
 -define(test_assoc_lookup, enabled).
+-if(false).
 -define(test_id_poly_eval, enabled).
 -define(test_server_fn, enabled).
 -endif.
@@ -136,16 +136,22 @@ tuple_poly_eval_test_() -> [
 %
 % Hint: implement by wrapping lists:keyfind() and using a case
 % to pattern-match on the result.
-assoc_lookup(_Key, _Assoc, _DefaultFn) ->
-    'TODO'.
 
+assoc_lookup(Key, Assoc, DefaultFn) ->
+  case lists:keyfind(Key, 1, Assoc) of
+      {_, Value} -> Value;
+      false -> DefaultFn()
+  end.
 
 % Lookup the Value of Key in assoc list Assoc list containing
 % { Key, Value } pairs.  If not found, return 0.
 %
 % Hint: wrap assoc_lookup.
-assoc_lookup_0(_Key, _Assoc) ->
-    'TODO'.
+assoc_lookup_0(Key, Assoc) ->
+  case lists:keyfind(Key, 1, Assoc) of
+      {_, Value} -> Value;
+      false -> 0
+  end.
 
 % Lookup the Value of Key in assoc list Assoc list containing
 % { Key, Value } pairs.  If not found, throw an exception
@@ -154,8 +160,11 @@ assoc_lookup_0(_Key, _Assoc) ->
 % format("key ~p not found", [Key]) ).
 %
 % Hint: wrap assoc_lookup.
-assoc_lookup_throw(_Key, _Assoc) ->
-    'TODO'.
+assoc_lookup_throw(Key, Assoc) ->
+  case lists:keyfind(Key, 1, Assoc) of
+      {_, Value} -> Value;
+      false -> throw({not_found, format("key ~p not found", [Key])})
+  end.
 
 -ifdef(test_assoc_lookup).
 assoc_lookup_test_() ->
