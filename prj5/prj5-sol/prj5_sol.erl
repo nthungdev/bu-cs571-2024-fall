@@ -12,8 +12,8 @@
 %% by being enclosed within if(false) ... endif directives.
 
 -define(test_rec_poly_eval, enabled).
--if(false).
 -define(test_non_rec_poly_eval, enabled).
+-if(false).
 -define(test_tuple_poly_eval, enabled).
 -define(test_assoc_lookup, enabled).
 -define(test_id_poly_eval, enabled).
@@ -37,12 +37,12 @@
 % *Hint*: Use an auxiliary function.
 
 rec_poly_eval(Coeffs, X) ->
-    rec_poly_eval(Coeffs, X, 0, 0).
+  rec_poly_eval(Coeffs, X, 0, 0).
 
 rec_poly_eval([], _X, _P, Acc) ->
-    Acc;
+  Acc;
 rec_poly_eval([Coeff | Rest], X, P, Acc) ->
-    rec_poly_eval(Rest, X, P + 1, Acc + Coeff * math:pow(X, P)).
+  rec_poly_eval(Rest, X, P + 1, Acc + Coeff * math:pow(X, P)).
 
 -ifdef(test_rec_poly_eval).
 rec_poly_eval_test_() -> [
@@ -72,8 +72,10 @@ rec_poly_eval_test_() -> [
 % *Hint*: Use a list comprehension to compute the terms of the
 % polynomial (using list:zip, list:seq() and math:pow())
 % followed by a lists:foldl() to sum the terms.
-non_rec_poly_eval(_Coeffs, _X) ->
-    'TODO'.
+
+non_rec_poly_eval(Coeffs, X) ->
+  Terms = [C * math:pow(X, I) || {C, I} <- lists:zip(Coeffs, lists:seq(0, length(Coeffs) - 1))],
+  lists:foldl(fun(Term, Acc) -> Term + Acc end, 0, Terms).
 
 
 -ifdef(test_non_rec_poly_eval).
