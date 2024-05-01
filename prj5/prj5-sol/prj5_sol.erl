@@ -16,8 +16,8 @@
 -define(test_tuple_poly_eval, enabled).
 -define(test_assoc_lookup, enabled).
 -define(test_id_poly_eval, enabled).
--if(false).
 -define(test_server_fn, enabled).
+-if(false).
 -endif.
 
 
@@ -263,8 +263,29 @@ id_poly_eval_test_() ->
 %      to log an error on standard error and recurse with both Assoc and
 %      Coeffs unchanged.
 
-server_fn(_Assoc, _Coeffs) ->
-    'TODO'.
+server_fn(Assoc, Coeffs) ->
+  receive
+    { ClientPid, stop } ->
+      ClientPid ! { self(), stopped },
+      ok;
+
+    { ClientPid, set_assoc, Assoc1 } ->
+      ClientPid ! { self(), set_assoc },
+      server_fn(Assoc1, Coeffs);
+
+    { ClientPid, set_coeffs, Coeffs1 } ->
+      ClientPid ! { self(), set_coeffs },
+      server_fn(Assoc, Coeffs1);
+
+    { ClientPid, eval, X } ->
+      Result = id_poly_eval(Assoc, Coeffs, X),
+      ClientPid ! { self(), eval, Result},
+      server_fn(Assoc, Coeffs);
+
+    { _ClientPid, Msg } ->
+      io:format(standard_error, "unknown message ~p~n", [ Msg ]),
+      server_fn(Assoc, Coeffs)
+  end.
 
 -ifdef(test_server_fn).
 
