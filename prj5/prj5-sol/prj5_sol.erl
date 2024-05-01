@@ -13,8 +13,8 @@
 
 -define(test_rec_poly_eval, enabled).
 -define(test_non_rec_poly_eval, enabled).
--if(false).
 -define(test_tuple_poly_eval, enabled).
+-if(false).
 -define(test_assoc_lookup, enabled).
 -define(test_id_poly_eval, enabled).
 -define(test_server_fn, enabled).
@@ -105,9 +105,10 @@ non_rec_poly_eval_test_() -> [
 %
 % *Hint*: Your solution can strip the coefficient out of tuple-pair
 % and then call any one of the solutions to the two previous exercises.
-tuple_poly_eval(_TupleCoeffs, _X) ->
-    'TODO'.
 
+tuple_poly_eval(TupleCoeffs, X) ->
+  Coeffs = [C || { _num, C } <- TupleCoeffs],
+  non_rec_poly_eval(Coeffs, X).
 
 -ifdef(test_tuple_poly_eval).
 tuple_poly_eval_test_() -> [
