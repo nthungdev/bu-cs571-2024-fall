@@ -1,0 +1,150 @@
+% an annotated fake log of running project code
+
+% start erlang REPL
+$ erl
+Eshell V...  (abort with ^G)
+
+% compile project into REPL
+1> c(prj5_sol).
+{ok,prj5_sol}
+
+% evaluate 1 + 1*5 + 1*5^2
+2> prj5_sol:rec_poly_eval([1, 1, 1], 5).
+31
+
+% empty polynomial evaluates to 0
+3> prj5_sol:rec_poly_eval([], 5).
+0
+
+% evaluate 1 + 2*5 + 3*5^2 + 4*5^3
+4> prj5_sol:rec_poly_eval([1, 2, 3, 4], 5).
+586
+
+% same as above, but using non_rec_poly_eval()
+5> prj5_sol:non_rec_poly_eval([1, 2, 3, 4], 5).
+586.0
+
+% 1 + 2*4 + 3*4^2
+6> prj5_sol:non_rec_poly_eval([1, 2, 3], 4).
+57.0
+
+% same as above, but Coeffs is list of pairs
+7> prj5_sol:tuple_poly_eval([{num, 1}, {num, 2}, {num, 3}], 4).
+57
+
+% 1 + 2*5 + 3*5^2 + 1*5^3
+8> prj5_sol:tuple_poly_eval([{num, 1}, {num, 2}, {num, 3}, {num, 1}], 5).
+211
+
+9> prj5_sol:tuple_poly_eval([{num, 1}], 5).
+1
+
+10> prj5_sol:tuple_poly_eval([], 5).
+0
+
+% lookup in empty assoc, fail over to default fun
+11> prj5_sol:assoc_lookup(a, [], fun() -> 42 end).
+42
+
+% lookup with value found in Assoc
+12> prj5_sol:assoc_lookup(a, [{b, 12}, {a, 22}], fun() -> 42 end).
+22
+
+% another fail-over to default
+13> prj5_sol:assoc_lookup(c, [{b, 12}, {a, 22}], fun() -> 42 end).
+42
+
+% lookup with default 0
+14> prj5_sol:assoc_lookup_0(c, [{b, 12}, {a, 22}]).
+0
+
+% lookup with value found in Assoc
+15> prj5_sol:assoc_lookup_0(a, [{b, 12}, {a, 22}]).
+22
+
+% lookup with value found in Assoc
+16> prj5_sol:assoc_lookup_throw(a, [{b, 12}, {a, 22}]).
+22
+
+% lookup with failure throwing
+17> prj5_sol:assoc_lookup_throw(c, [{b, 12}, {a, 22}]).
+** exception throw: {not_found,"key c not found"}
+     in function  prj5_sol:'-assoc_lookup_throw/2 ...
+
+% 2 + a*5 + c*5^2 == 2 + 1*5 + 3*5^2
+18> prj5_sol:id_poly_eval([{a, 1}, {b, 2}, {c, 3}],
+                          [{num, 2}, {id,a}, {id,c}], 5).
+82
+
+% 2 + a*5 + d*5^2 == 2 + 1*5 + 0*5^2
+19> prj5_sol:id_poly_eval([{a, 1}, {b, 2}, {c, 3}],
+                          [{num, 2}, {id,a}, {id,d}], 5).
+7
+
+% create server with Assoc == [{a, 1}, {b, 2}, {c, 3}]
+% and coeffs == [{id,c}, {num,2}, {id, a}, {id, b}, {id, x}].
+20> PID1 = spawn(prj5_sol, server_fn, [
+                 [{a, 1}, {b, 2}, {c, 3}],
+		 [{id,c}, {num,2}, {id, a}, {id, b}, {id, x}]]).
+<0.115.0>
+
+% c + 2*1 + a*1^2 + b*1^3 + x*1^4 == 3 + 2 + 1 + 2 + 0
+21> prj5_sol:server_eval(PID1, 1).
+8
+
+% c + 2*3 + a*3^2 + b*3^3 + x*3^4 == 3 + 6 + 9 + 54 + 0
+22> prj5_sol:server_eval(PID1, 3).
+72
+
+% set Assoc to [{a, 22}, {b, 33}, {c, 2}].
+23> prj5_sol:server_set_assoc(PID1, [{a, 22}, {b, 33}, {c, 2}]).
+set_assoc
+
+% c + 2*1 + a*1^2 + b*1^3 + x*1^4 == 2 + 2 + 22 + 33 + 0
+24> prj5_sol:server_eval(PID1, 1).
+59
+
+% c + 2*3 + a*3^2 + b*3^3 + x*3^4 == 2 + 2*3 + 22*3^2 + 33*3^3 + 0*3^4
+25> prj5_sol:server_eval(PID1, 3).
+1097
+
+% verifying about result
+26> 2 + 2*3 + 22*9 + 33*27.
+1097
+
+27> prj5_sol:server_set_coeffs(PID1, [{id, a}, {num, 33}, {id, c}]).
+set_coeffs
+
+% a + 33*1 + c*1^2 ==  22 + 33 + 2
+28> prj5_sol:server_eval(PID1, 1).
+57
+
+% a + 33*3 + c*3^2 == 22 + 33*3 + 2*9
+29> prj5_sol:server_eval(PID1, 3).
+139
+
+% verifying
+30> 22 + 33*3 + 2*9.
+139
+
+% checking if server is alive
+31> is_process_alive(PID1).
+true
+
+% send it a stop message
+32> PID1 ! { self(), stop }, receive X11 -> X11 end.
+{<0.115.0>,stopped}
+
+% checking if server is still alive after stop
+33> is_process_alive(PID1).
+false
+
+% run all tests
+34> prj5_sol:test().
+  All 48 tests passed.
+ok
+
+% quit erlang REPL
+35> q().
+ok
+36> $ 
