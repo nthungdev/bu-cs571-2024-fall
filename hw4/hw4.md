@@ -120,7 +120,7 @@ SC has size of 40 bytes.
 - 5: Legal. Because `c1` has static type `C`, which is the same as `c2`'s type.
 - 6: Illegal. Because `c2` has static type `C`, which is not the same as `sc`'s type (`SC`). `SC` is, however, `C`.
 
-### Question 7
+## Question 7
 
 - Haskell's pattern matching is used extensively in function definitions and case expressions, algebraic data types, lists, tuples, and more complex structures.
 
